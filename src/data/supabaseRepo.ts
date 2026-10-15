@@ -1,6 +1,6 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import type { Repo } from './repo'
-import type { Cliente, Pedido } from './types'
+import type { Cliente, Pagamento, Pedido } from './types'
 
 const url = import.meta.env.VITE_SUPABASE_URL as string | undefined
 const chave = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
@@ -25,6 +25,11 @@ function lerPedido(linha: Record<string, unknown>): Pedido {
     horario: (p.horario ?? '').slice(0, 5),
     taxa_entrega: Number(p.taxa_entrega),
   }
+}
+
+function lerPagamento(linha: Record<string, unknown>): Pagamento {
+  const pg = linha as unknown as Pagamento
+  return { ...pg, valor: Number(pg.valor) }
 }
 
 export function criarRepoSupabase(): Repo {
@@ -78,6 +83,23 @@ export function criarRepoSupabase(): Repo {
     },
     async excluirPedido(id) {
       const { error } = await db.from('pedidos').delete().eq('id', id)
+      erro(error)
+    },
+
+    async listarPagamentos(pedidoId) {
+      let consulta = db.from('pagamentos').select('id, pedido_id, data, valor, forma').order('data')
+      if (pedidoId) consulta = consulta.eq('pedido_id', pedidoId)
+      const { data, error } = await consulta
+      erro(error)
+      return (data ?? []).map(lerPagamento)
+    },
+    async salvarPagamento(dados) {
+      const { data, error } = await db.from('pagamentos').insert(dados).select('id, pedido_id, data, valor, forma').single()
+      erro(error)
+      return lerPagamento(data!)
+    },
+    async excluirPagamento(id) {
+      const { error } = await db.from('pagamentos').delete().eq('id', id)
       erro(error)
     },
 

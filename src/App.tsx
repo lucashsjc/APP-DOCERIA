@@ -10,6 +10,7 @@ import PedidoForm from './pages/PedidoForm'
 import Clientes from './pages/Clientes'
 import ClienteDetalhe from './pages/ClienteDetalhe'
 import ClienteForm from './pages/ClienteForm'
+import Financeiro from './pages/Financeiro'
 
 export default function App() {
   const [sessao, setSessao] = useState<Session | null | undefined>(modoDemonstracao ? null : undefined)
@@ -39,6 +40,7 @@ export default function App() {
           <Route path="/clientes/novo" element={<ClienteForm />} />
           <Route path="/clientes/:id" element={<ClienteDetalhe />} />
           <Route path="/clientes/:id/editar" element={<ClienteForm />} />
+          <Route path="/financeiro" element={<Financeiro />} />
         </Routes>
       </main>
       <nav className="abas">
@@ -47,6 +49,9 @@ export default function App() {
         </NavLink>
         <NavLink to="/clientes">
           <span aria-hidden>👥</span>Clientes
+        </NavLink>
+        <NavLink to="/financeiro">
+          <span aria-hidden>💰</span>Financeiro
         </NavLink>
       </nav>
     </HashRouter>

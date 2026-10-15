@@ -368,7 +368,7 @@ legend {
   right: 0;
   bottom: 0;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   background: var(--superficie);
   border-top: 1px solid var(--borda);
   padding-bottom: env(safe-area-inset-bottom);
@@ -406,4 +406,100 @@ legend {
 .login h1 {
   text-align: center;
   font-size: 32px;
+}
+
+.alternar.tres {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.linha-acao {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.falta {
+  color: var(--s-em_producao);
+  font-weight: 600;
+}
+
+.quitado {
+  color: var(--s-entregue);
+  font-weight: 600;
+}
+
+.atrasado,
+.falta.atrasado {
+  color: var(--perigo);
+}
+
+.nota {
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.mes {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  padding: 4px;
+}
+
+.mes span {
+  font-weight: 600;
+}
+
+.mes span::first-letter {
+  text-transform: uppercase;
+}
+
+.mes button {
+  border: 0;
+  background: none;
+  font-size: 28px;
+  width: 44px;
+  height: 44px;
+  color: var(--marca);
+}
+
+.numeros {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.numero {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  padding: 14px 16px;
+}
+
+.numero strong {
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+}
+
+.numero.largo strong {
+  font-size: 28px;
+}
+
+.numero-rotulo {
+  font-size: 13px;
+  color: var(--suave);
+}
+
+.cartao.destaque-atraso {
+  border-color: var(--perigo);
+}
+
+.sem-link {
+  text-decoration: none;
+  color: inherit;
 }

@@ -52,3 +52,14 @@ export function telefoneWhatsApp(telefone: string): string {
   const digitos = telefone.replace(/\D/g, '')
   return digitos.length <= 11 ? `55${digitos}` : digitos
 }
+
+/** "outubro de 2026" */
+export function formatarMes(anoMes: string): string {
+  return dataLocal(`${anoMes}-01`).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+}
+
+/** Link do WhatsApp com a mensagem já escrita. */
+export function linkWhatsApp(telefone: string, mensagem?: string): string {
+  const texto = mensagem ? `?text=${encodeURIComponent(mensagem)}` : ''
+  return `https://wa.me/${telefoneWhatsApp(telefone)}${texto}`
+}

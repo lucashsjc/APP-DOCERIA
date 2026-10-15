@@ -1,4 +1,4 @@
-import type { Cliente, NovoCliente, NovoPedido, Pedido } from './types'
+import type { Cliente, NovoCliente, NovoPagamento, NovoPedido, Pagamento, Pedido } from './types'
 import { criarRepoLocal } from './localRepo'
 import { criarRepoSupabase, supabaseConfigurado } from './supabaseRepo'
 
@@ -12,6 +12,10 @@ export interface Repo {
   buscarPedido(id: string): Promise<Pedido | null>
   salvarPedido(dados: NovoPedido, id?: string): Promise<Pedido>
   excluirPedido(id: string): Promise<void>
+
+  listarPagamentos(pedidoId?: string): Promise<Pagamento[]>
+  salvarPagamento(dados: NovoPagamento): Promise<Pagamento>
+  excluirPagamento(id: string): Promise<void>
 
   /** Guarda a foto e devolve o caminho a salvar em `foto_path`. */
   enviarFoto(foto: Blob): Promise<string>

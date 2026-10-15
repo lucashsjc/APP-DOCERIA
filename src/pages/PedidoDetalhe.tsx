@@ -3,8 +3,9 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Cabecalho, Estado } from '../components'
 import { repo } from '../data/repo'
 import { STATUS, STATUS_NOME, totalPedido, type Status } from '../data/types'
-import { formatarData, formatarMoeda, telefoneWhatsApp } from '../lib/format'
+import { formatarData, formatarMoeda, linkWhatsApp } from '../lib/format'
 import { useCarregar } from '../lib/useCarregar'
+import PagamentosPedido from './PagamentosPedido'
 
 export default function PedidoDetalhe() {
   const { id } = useParams()
@@ -117,6 +118,8 @@ export default function PedidoDetalhe() {
         </div>
       </section>
 
+      <PagamentosPedido pedido={pedido} cliente={cliente} />
+
       {pedido.observacoes && (
         <section className="bloco">
           <h2>Observações</h2>
@@ -133,7 +136,7 @@ export default function PedidoDetalhe() {
 
       <section className="acoes">
         {cliente?.telefone && (
-          <a className="botao" href={`https://wa.me/${telefoneWhatsApp(cliente.telefone)}`} target="_blank" rel="noreferrer">
+          <a className="botao" href={linkWhatsApp(cliente.telefone)} target="_blank" rel="noreferrer">
             WhatsApp de {cliente.nome.split(' ')[0]}
           </a>
         )}

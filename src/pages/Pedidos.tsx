@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Cabecalho, Estado, StatusSelo } from '../components'
 import { repo } from '../data/repo'
-import { totalPedido, type Pedido } from '../data/types'
+import { contaComoVenda, saldoPedido, totalPedido, type Pedido } from '../data/types'
 import { formatarDataRelativa, formatarMoeda, hojeIso } from '../lib/format'
 import { useCarregar } from '../lib/useCarregar'
 
@@ -23,19 +23,19 @@ export default function Pedidos() {
   const [filtro, setFiltro] = useState<Filtro>('proximos')
   const [busca, setBusca] = useState('')
   const { dados, erro } = useCarregar(
-    () => Promise.all([repo.listarPedidos(), repo.listarClientes()]),
+    () => Promise.all([repo.listarPedidos(), repo.listarClientes(), repo.listarPagamentos()]),
     [],
   )
 
   const grupos = useMemo(() => {
     if (!dados) return []
-    const [pedidos, clientes] = dados
+    const [pedidos, clientes, pagamentos] = dados
     const nomes = new Map(clientes.map((c) => [c.id, c.nome]))
     const termo = busca.trim().toLocaleLowerCase('pt-BR')
 
     const lista = pedidos
       .filter(FILTROS[filtro].aceita)
-      .map((p) => ({ ...p, cliente: nomes.get(p.cliente_id) ?? '—' }))
+      .map((p) => ({ ...p, cliente: nomes.get(p.cliente_id) ?? '—', saldo: saldoPedido(p, pagamentos) }))
       .filter((p) => !termo || `${p.cliente} ${p.tema}`.toLocaleLowerCase('pt-BR').includes(termo))
       .sort((a, b) => chaveData(a).localeCompare(chaveData(b)))
     // Próximos: do mais perto para o mais longe. Histórico: do mais recente para o mais antigo.
@@ -96,6 +96,11 @@ export default function Pedidos() {
                 </span>
                 <StatusSelo status={p.status} />
               </div>
+              {contaComoVenda(p) && (
+                <div className={p.saldo > 0 ? 'falta nota' : 'quitado nota'}>
+                  {p.saldo > 0 ? `Falta ${formatarMoeda(p.saldo)}` : '✓ Pago'}
+                </div>
+              )}
             </Link>
           ))}
         </section>

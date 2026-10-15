@@ -1,22 +1,23 @@
 import type { Repo } from './repo'
-import type { Cliente, Pedido } from './types'
+import type { Cliente, Pagamento, Pedido } from './types'
 
 const CHAVE = 'doceria-demo'
 
 interface Banco {
   clientes: Cliente[]
   pedidos: Pedido[]
+  pagamentos: Pagamento[]
   fotos: Record<string, string>
 }
 
 function ler(): Banco {
   try {
     const salvo = localStorage.getItem(CHAVE)
-    if (salvo) return JSON.parse(salvo)
+    if (salvo) return { pagamentos: [], ...JSON.parse(salvo) }
   } catch {
     // sem armazenamento: começa vazio
   }
-  return { clientes: [], pedidos: [], fotos: {} }
+  return { clientes: [], pedidos: [], pagamentos: [], fotos: {} }
 }
 
 function gravar(banco: Banco) {
@@ -81,6 +82,23 @@ export function criarRepoLocal(): Repo {
     async excluirPedido(id) {
       const banco = ler()
       banco.pedidos = banco.pedidos.filter((p) => p.id !== id)
+      banco.pagamentos = banco.pagamentos.filter((pg) => pg.pedido_id !== id)
+      gravar(banco)
+    },
+
+    async listarPagamentos(pedidoId) {
+      return ler().pagamentos.filter((pg) => !pedidoId || pg.pedido_id === pedidoId)
+    },
+    async salvarPagamento(dados) {
+      const banco = ler()
+      const pagamento: Pagamento = { ...dados, id: crypto.randomUUID() }
+      banco.pagamentos.push(pagamento)
+      gravar(banco)
+      return pagamento
+    },
+    async excluirPagamento(id) {
+      const banco = ler()
+      banco.pagamentos = banco.pagamentos.filter((pg) => pg.id !== id)
       gravar(banco)
     },
 
