@@ -28,9 +28,7 @@ App para a dona de uma loja de doces organizar pedidos, clientes, agenda e receb
 ## Calendário
 
 - Calendário dentro do app (pedidos por dia, semana e mês).
-- O iPhone assina um calendário do app (link secreto): cada pedido aparece sozinho na agenda
-  com data de entrega, nome do cliente e tema da festa.
-- Sincronização só do app para a agenda (limitação do PWA).
+- Sem integração com o calendário do iPhone: a agenda do app é suficiente (decidido em out/2026).
 
 ## Financeiro
 
@@ -41,9 +39,9 @@ App para a dona de uma loja de doces organizar pedidos, clientes, agenda e receb
 
 ## Etapas
 
-1. Clientes e pedidos.
-2. Pagamentos e painel financeiro.
-3. Calendário dentro do app.
-4. Assinatura da agenda do iPhone.
+1. ✅ Clientes e pedidos.
+2. ✅ Pagamentos e painel financeiro.
+3. ✅ Calendário dentro do app.
+4. ~~Assinatura da agenda do iPhone~~ — cancelada; a agenda do app é suficiente.
 
 Os pedidos do caderno serão digitados à mão depois que o app estiver pronto.
