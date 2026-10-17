@@ -39,20 +39,22 @@ export default function Clientes() {
       />
       <Estado erro={erro} carregando={!dados} />
       {dados && clientes.length === 0 && <p className="vazio">Nenhum cliente encontrado.</p>}
-      {clientes.map((c) => {
-        const qtd = pedidosPorCliente.get(c.id) ?? 0
-        return (
-          <Link key={c.id} to={`/clientes/${c.id}`} className="cartao">
-            <div className="linha">
-              <strong>{c.nome}</strong>
-              <span className="suave">
-                {qtd} {qtd === 1 ? 'pedido' : 'pedidos'}
-              </span>
-            </div>
-            {c.telefone && <div className="suave">{c.telefone}</div>}
-          </Link>
-        )
-      })}
+      <div className="lista">
+        {clientes.map((c) => {
+          const qtd = pedidosPorCliente.get(c.id) ?? 0
+          return (
+            <Link key={c.id} to={`/clientes/${c.id}`} className="cartao">
+              <div className="linha">
+                <strong>{c.nome}</strong>
+                <span className="suave">
+                  {qtd} {qtd === 1 ? 'pedido' : 'pedidos'}
+                </span>
+              </div>
+              {c.telefone && <div className="suave">{c.telefone}</div>}
+            </Link>
+          )
+        })}
+      </div>
     </>
   )
 }

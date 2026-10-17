@@ -191,10 +191,10 @@ export default function PedidoForm() {
 
         <div className="alternar">
           <button type="button" className={tipo === 'retirada' ? 'ativo' : ''} onClick={() => setTipo('retirada')}>
-            🏠 Retirada
+            Retirada
           </button>
           <button type="button" className={tipo === 'entrega' ? 'ativo' : ''} onClick={() => setTipo('entrega')}>
-            🚗 Entrega
+            Entrega
           </button>
         </div>
         {tipo === 'entrega' && (

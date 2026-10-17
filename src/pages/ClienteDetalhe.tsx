@@ -55,7 +55,7 @@ export default function ClienteDetalhe() {
       />
 
       <section className="bloco">
-        {cliente.telefone ? <p>📞 {cliente.telefone}</p> : <p className="suave">Sem telefone.</p>}
+        {cliente.telefone ? <p>{cliente.telefone}</p> : <p className="suave">Sem telefone.</p>}
         {cliente.observacoes && <p className="texto-livre">{cliente.observacoes}</p>}
         {totalDevido > 0 ? (
           <p className="falta">Deve {formatarMoeda(totalDevido)}</p>

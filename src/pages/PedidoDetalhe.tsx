@@ -64,7 +64,7 @@ export default function PedidoDetalhe() {
           {formatarData(pedido.data_entrega)}
           {pedido.horario && ` às ${pedido.horario}`}
         </p>
-        <p>{pedido.tipo === 'entrega' ? '🚗 Entrega' : '🏠 Retirada'}</p>
+        <p>{pedido.tipo === 'entrega' ? 'Entrega' : 'Retirada no local'}</p>
         {pedido.tipo === 'entrega' && pedido.endereco && (
           <p>
             {pedido.endereco}{' '}
@@ -77,7 +77,11 @@ export default function PedidoDetalhe() {
             </a>
           </p>
         )}
-        {pedido.tema && <p>🎉 Tema: {pedido.tema}</p>}
+        {pedido.tema && (
+          <p>
+            <span className="suave">Tema:</span> {pedido.tema}
+          </p>
+        )}
       </section>
 
       <section className="bloco">

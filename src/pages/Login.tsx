@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { supabase } from '../data/supabaseRepo'
+import { NOME_LOJA } from '../marca'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -18,8 +19,12 @@ export default function Login() {
 
   return (
     <main className="login">
-      <h1>🧁 Doceria</h1>
-      <form onSubmit={entrar} className="formulario">
+      <section className="login-texto">
+        <span className="logo">{NOME_LOJA}</span>
+        <h1>Seus pedidos, sempre organizados.</h1>
+        <p className="suave">Pedidos, clientes, agenda e recebimentos da loja em um só lugar.</p>
+      </section>
+      <form onSubmit={entrar} className="formulario cartao-login">
         <label>
           E-mail
           <input type="email" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} required />

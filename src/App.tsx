@@ -12,6 +12,8 @@ import ClienteDetalhe from './pages/ClienteDetalhe'
 import ClienteForm from './pages/ClienteForm'
 import Financeiro from './pages/Financeiro'
 import Agenda from './pages/Agenda'
+import { IconeAgenda, IconeClientes, IconeFinanceiro, IconePedidos } from './icones'
+import { NOME_LOJA } from './marca'
 
 export default function App() {
   const [sessao, setSessao] = useState<Session | null | undefined>(modoDemonstracao ? null : undefined)
@@ -31,6 +33,27 @@ export default function App() {
       {modoDemonstracao && (
         <div className="aviso-demo">Modo demonstração: os dados ficam só neste aparelho.</div>
       )}
+      <header className="topo">
+        <span className="logo">{NOME_LOJA}</span>
+        <nav className="abas">
+          <NavLink to="/" end>
+            <IconePedidos />
+            Pedidos
+          </NavLink>
+          <NavLink to="/agenda">
+            <IconeAgenda />
+            Agenda
+          </NavLink>
+          <NavLink to="/clientes">
+            <IconeClientes />
+            Clientes
+          </NavLink>
+          <NavLink to="/financeiro">
+            <IconeFinanceiro />
+            Financeiro
+          </NavLink>
+        </nav>
+      </header>
       <main className="conteudo">
         <Routes>
           <Route path="/" element={<Pedidos />} />
@@ -45,20 +68,6 @@ export default function App() {
           <Route path="/agenda" element={<Agenda />} />
         </Routes>
       </main>
-      <nav className="abas">
-        <NavLink to="/" end>
-          <span aria-hidden>🧁</span>Pedidos
-        </NavLink>
-        <NavLink to="/agenda">
-          <span aria-hidden>📅</span>Agenda
-        </NavLink>
-        <NavLink to="/clientes">
-          <span aria-hidden>👥</span>Clientes
-        </NavLink>
-        <NavLink to="/financeiro">
-          <span aria-hidden>💰</span>Financeiro
-        </NavLink>
-      </nav>
     </HashRouter>
   )
 }

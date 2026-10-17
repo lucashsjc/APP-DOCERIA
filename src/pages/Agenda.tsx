@@ -107,7 +107,7 @@ export default function Agenda() {
       <Estado erro={erro} carregando={!dados} />
 
       {dados && visao === 'mes' && (
-        <>
+        <div className="agenda-mes">
           <div className="calendario">
             {SEMANA.map((d, i) => (
               <span key={i} className="calendario-semana">
@@ -135,15 +135,17 @@ export default function Agenda() {
             })}
           </div>
 
-          <h2 className="dia">{formatarDataRelativa(dia)}</h2>
-          {(porDia.get(dia) ?? []).map((p) => (
-            <CartaoPedido key={p.id} pedido={p} cliente={p.cliente} saldo={p.saldo} />
-          ))}
-          {!porDia.get(dia) && <p className="vazio">Nenhum pedido neste dia.</p>}
-          <Link to={`/pedidos/novo?data=${dia}`} className="botao primario">
-            + Novo pedido neste dia
-          </Link>
-        </>
+          <div className="agenda-dia">
+            <h2 className="dia">{formatarDataRelativa(dia)}</h2>
+            {(porDia.get(dia) ?? []).map((p) => (
+              <CartaoPedido key={p.id} pedido={p} cliente={p.cliente} saldo={p.saldo} />
+            ))}
+            {!porDia.get(dia) && <p className="vazio">Nenhum pedido neste dia.</p>}
+            <Link to={`/pedidos/novo?data=${dia}`} className="botao primario">
+              + Novo pedido neste dia
+            </Link>
+          </div>
+        </div>
       )}
 
       {dados &&

@@ -11,7 +11,7 @@ interface Devedor {
   cliente: Cliente
   valor: number
   pedidos: Pedido[]
-  atrasado: boolean
+  atrasado: number
 }
 
 export default function Financeiro() {
@@ -36,18 +36,18 @@ export default function Financeiro() {
       if (saldo <= 0) continue
       const cliente = clientes.find((c) => c.id === p.cliente_id)
       if (!cliente) continue
-      const devedor = porCliente.get(cliente.id) ?? { cliente, valor: 0, pedidos: [], atrasado: false }
+      const devedor = porCliente.get(cliente.id) ?? { cliente, valor: 0, pedidos: [], atrasado: 0 }
       devedor.valor += saldo
       devedor.pedidos.push(p)
-      devedor.atrasado ||= p.data_entrega < hoje
+      if (p.data_entrega < hoje) devedor.atrasado += saldo
       porCliente.set(cliente.id, devedor)
     }
     // Atrasados primeiro, depois quem deve mais.
     const devedores = [...porCliente.values()].sort(
-      (a, b) => Number(b.atrasado) - Number(a.atrasado) || b.valor - a.valor,
+      (a, b) => Number(b.atrasado > 0) - Number(a.atrasado > 0) || b.valor - a.valor,
     )
     const aReceber = devedores.reduce((s, d) => s + d.valor, 0)
-    const atrasado = devedores.filter((d) => d.atrasado).reduce((s, d) => s + d.valor, 0)
+    const atrasado = devedores.reduce((s, d) => s + d.atrasado, 0)
 
     return { vendido, qtdVendas: vendasDoMes.length, recebido, aReceber, atrasado, devedores }
   }, [dados, mes])
@@ -90,31 +90,33 @@ export default function Financeiro() {
           </div>
 
           <h2 className="dia">Quem está devendo</h2>
-          {resumo.devedores.length === 0 && <p className="vazio">Ninguém devendo. 🎉</p>}
-          {resumo.devedores.map((d) => (
-            <div key={d.cliente.id} className={d.atrasado ? 'cartao destaque-atraso' : 'cartao'}>
-              <Link to={`/clientes/${d.cliente.id}`} className="linha sem-link">
-                <strong>{d.cliente.nome}</strong>
-                <strong>{formatarMoeda(d.valor)}</strong>
-              </Link>
-              <div className="linha suave">
-                <span>
-                  {d.pedidos.length} {d.pedidos.length === 1 ? 'pedido' : 'pedidos'}
-                  {d.atrasado && <span className="atrasado"> · atrasado</span>}
-                </span>
-                {d.cliente.telefone && (
-                  <a
-                    className="botao pequeno"
-                    href={linkWhatsApp(d.cliente.telefone, mensagemCobranca(d.cliente.nome, d.valor, d.pedidos))}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Cobrar
-                  </a>
-                )}
+          {resumo.devedores.length === 0 && <p className="vazio">Ninguém devendo.</p>}
+          <div className="lista">
+            {resumo.devedores.map((d) => (
+              <div key={d.cliente.id} className={d.atrasado > 0 ? 'cartao destaque-atraso' : 'cartao'}>
+                <Link to={`/clientes/${d.cliente.id}`} className="linha sem-link">
+                  <strong>{d.cliente.nome}</strong>
+                  <strong>{formatarMoeda(d.valor)}</strong>
+                </Link>
+                <div className="linha suave">
+                  <span>
+                    {d.pedidos.length} {d.pedidos.length === 1 ? 'pedido' : 'pedidos'}
+                    {d.atrasado > 0 && <span className="atrasado"> · {formatarMoeda(d.atrasado)} atrasado</span>}
+                  </span>
+                  {d.cliente.telefone && (
+                    <a
+                      className="botao pequeno"
+                      href={linkWhatsApp(d.cliente.telefone, mensagemCobranca(d.cliente.nome, d.valor, d.pedidos))}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Cobrar
+                    </a>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </>
       )}
     </>
