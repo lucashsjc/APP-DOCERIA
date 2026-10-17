@@ -1,26 +1,30 @@
-/* ---------- Identidade ----------
-   Troque --marca (e --marca-forte, um tom mais escuro) pela cor do logo da loja. */
+/* ---------- Identidade: cores do logo do Ateliê Doce Festa ----------
+   rosa (principal), azul-água (detalhes), chocolate (títulos), creme (fundo). */
 :root {
-  --marca: #f26b1d;
-  --marca-forte: #d9560d;
-  --marca-clara: #fff1e8;
+  --marca: #d63a78;
+  --marca-forte: #b82c63;
+  --marca-clara: #fde6f0;
   --marca-texto: #ffffff;
+  --acento: #1f9cc0;
+  --acento-claro: #dff4fb;
+  --chocolate: #5b2f24;
+  --creme: #fff4d9;
 
-  --fundo: #ffffff;
+  --fundo: #fffafc;
   --superficie: #ffffff;
-  --superficie-2: #f7f7fa;
-  --texto: #1c1c2b;
-  --suave: #70707f;
-  --borda: #ececf2;
+  --superficie-2: #fdf3f7;
+  --texto: #34222b;
+  --suave: #84707b;
+  --borda: #f3e3ea;
   --perigo: #e5484d;
   --sucesso: #17a34a;
   --aviso: #d97706;
-  --sombra: 0 10px 30px rgba(28, 28, 60, 0.07);
+  --sombra: 0 10px 30px rgba(120, 40, 80, 0.07);
   --sombra-marca: 0 8px 20px color-mix(in srgb, var(--marca) 30%, transparent);
   --raio: 18px;
-  --brilho-1: #e3faf3;
-  --brilho-2: #ffe9ef;
-  --brilho-3: #efeaff;
+  --brilho-1: #dcf3fb;
+  --brilho-2: #ffe1ee;
+  --brilho-3: #fff1d2;
 
   --s-orcamento: #6b7280;
   --s-confirmado: #2563eb;
@@ -38,23 +42,27 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --marca: #ff8a3d;
-    --marca-forte: #ff9d5c;
-    --marca-clara: #3a2416;
-    --marca-texto: #1c1209;
-    --fundo: #13131b;
-    --superficie: #1c1c27;
-    --superficie-2: #24242f;
-    --texto: #f2f2f6;
-    --suave: #a3a3b4;
-    --borda: #2d2d3b;
+    --marca: #f47aa8;
+    --marca-forte: #f892b9;
+    --marca-clara: #3d1d2b;
+    --marca-texto: #2a0f1b;
+    --acento: #6fd0ea;
+    --acento-claro: #123642;
+    --chocolate: #f3d9cf;
+    --creme: #3a3020;
+    --fundo: #171117;
+    --superficie: #221a22;
+    --superficie-2: #2b212b;
+    --texto: #f6edf1;
+    --suave: #b29fa9;
+    --borda: #3a2c37;
     --perigo: #ff6b6f;
     --sucesso: #4ade80;
     --aviso: #fbbf24;
     --sombra: 0 10px 30px rgba(0, 0, 0, 0.35);
-    --brilho-1: #12302a;
-    --brilho-2: #33182a;
-    --brilho-3: #221c3d;
+    --brilho-1: #10303a;
+    --brilho-2: #3a1628;
+    --brilho-3: #2e2614;
     color-scheme: dark;
   }
 }
@@ -121,10 +129,18 @@ button {
 }
 
 .logo {
+  font-family: 'Dancing Script', cursive;
   font-weight: 700;
-  font-size: 22px;
-  letter-spacing: -0.02em;
+  font-size: 30px;
+  line-height: 1;
   color: var(--marca);
+}
+
+.subtitulo-loja {
+  font-family: 'Dancing Script', cursive;
+  font-weight: 600;
+  font-size: 22px;
+  color: var(--chocolate);
 }
 
 /* ---------- Estrutura: celular ---------- */
@@ -189,6 +205,7 @@ button {
   flex: 1;
   font-size: 28px;
   font-weight: 700;
+  color: var(--chocolate);
   letter-spacing: -0.02em;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -532,6 +549,16 @@ a.cartao:active {
   line-height: 1.3;
 }
 
+.resumo-cartao:nth-child(2) .icone {
+  color: var(--acento);
+  background: var(--acento-claro);
+}
+
+.resumo-cartao:nth-child(3) .icone {
+  color: var(--chocolate);
+  background: var(--creme);
+}
+
 /* No celular, o valor a receber ocupa a linha inteira para caber. */
 @media (max-width: 899px) {
   .resumo {
@@ -751,9 +778,9 @@ legend {
 }
 
 .calendario-dia.hoje {
-  color: var(--marca);
+  color: var(--acento);
   font-weight: 700;
-  box-shadow: inset 0 0 0 2px var(--marca);
+  box-shadow: inset 0 0 0 2px var(--acento);
 }
 
 .calendario-dia.selecionado {
@@ -797,6 +824,11 @@ legend {
   line-height: 1.15;
   font-weight: 700;
   letter-spacing: -0.02em;
+  color: var(--chocolate);
+}
+
+.login-texto .logo {
+  font-size: 48px;
 }
 
 .cartao-login {
@@ -826,7 +858,7 @@ legend {
 
   .topo .logo {
     display: block;
-    font-size: 26px;
+    font-size: 34px;
   }
 
   .abas {

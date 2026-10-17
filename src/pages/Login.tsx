@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { supabase } from '../data/supabaseRepo'
-import { NOME_LOJA } from '../marca'
+import { NOME_LOJA, SUBTITULO_LOJA } from '../marca'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -20,7 +20,10 @@ export default function Login() {
   return (
     <main className="login">
       <section className="login-texto">
-        <span className="logo">{NOME_LOJA}</span>
+        <div>
+          <span className="logo">{NOME_LOJA}</span>
+          <div className="subtitulo-loja">{SUBTITULO_LOJA}</div>
+        </div>
         <h1>Seus pedidos, sempre organizados.</h1>
         <p className="suave">Pedidos, clientes, agenda e recebimentos da loja em um só lugar.</p>
       </section>
