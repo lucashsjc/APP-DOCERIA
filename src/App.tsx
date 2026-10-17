@@ -11,6 +11,7 @@ import Clientes from './pages/Clientes'
 import ClienteDetalhe from './pages/ClienteDetalhe'
 import ClienteForm from './pages/ClienteForm'
 import Financeiro from './pages/Financeiro'
+import Agenda from './pages/Agenda'
 
 export default function App() {
   const [sessao, setSessao] = useState<Session | null | undefined>(modoDemonstracao ? null : undefined)
@@ -41,11 +42,15 @@ export default function App() {
           <Route path="/clientes/:id" element={<ClienteDetalhe />} />
           <Route path="/clientes/:id/editar" element={<ClienteForm />} />
           <Route path="/financeiro" element={<Financeiro />} />
+          <Route path="/agenda" element={<Agenda />} />
         </Routes>
       </main>
       <nav className="abas">
         <NavLink to="/" end>
           <span aria-hidden>🧁</span>Pedidos
+        </NavLink>
+        <NavLink to="/agenda">
+          <span aria-hidden>📅</span>Agenda
         </NavLink>
         <NavLink to="/clientes">
           <span aria-hidden>👥</span>Clientes

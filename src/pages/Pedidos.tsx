@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Cabecalho, Estado, StatusSelo } from '../components'
+import { Cabecalho, CartaoPedido, Estado } from '../components'
 import { repo } from '../data/repo'
-import { contaComoVenda, saldoPedido, totalPedido, type Pedido } from '../data/types'
-import { formatarDataRelativa, formatarMoeda, hojeIso } from '../lib/format'
+import { saldoPedido, type Pedido } from '../data/types'
+import { formatarDataRelativa, hojeIso } from '../lib/format'
 import { useCarregar } from '../lib/useCarregar'
 
 const FILTROS = {
@@ -83,25 +83,7 @@ export default function Pedidos() {
             {filtro === 'proximos' && dia < hoje && ' · atrasado'}
           </h2>
           {pedidos.map((p) => (
-            <Link key={p.id} to={`/pedidos/${p.id}`} className="cartao">
-              <div className="linha">
-                <strong>{p.cliente}</strong>
-                <span>{formatarMoeda(totalPedido(p))}</span>
-              </div>
-              <div className="linha suave">
-                <span>
-                  {p.horario && `${p.horario} · `}
-                  {p.tipo === 'entrega' ? 'Entrega' : 'Retirada'}
-                  {p.tema && ` · ${p.tema}`}
-                </span>
-                <StatusSelo status={p.status} />
-              </div>
-              {contaComoVenda(p) && (
-                <div className={p.saldo > 0 ? 'falta nota' : 'quitado nota'}>
-                  {p.saldo > 0 ? `Falta ${formatarMoeda(p.saldo)}` : '✓ Pago'}
-                </div>
-              )}
-            </Link>
+            <CartaoPedido key={p.id} pedido={p} cliente={p.cliente} saldo={p.saldo} />
           ))}
         </section>
       ))}

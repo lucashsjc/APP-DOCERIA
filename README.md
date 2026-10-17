@@ -19,6 +19,11 @@ App (PWA) para a loja organizar pedidos, clientes, agenda e recebimentos. O plan
 - Orçamentos e pedidos cancelados não contam como venda nem como dívida. Um pedido fica
   atrasado quando a data de entrega já passou e ainda falta receber.
 
+**Etapa 3**
+- Aba Agenda: mês em grade com a quantidade de pedidos por dia, ou semana em lista.
+- Tocar num dia mostra os pedidos dele; "+ Novo pedido neste dia" já preenche a data.
+- Cancelados não aparecem; orçamentos aparecem mais apagados.
+
 ## Rodar no computador
 
 ```bash

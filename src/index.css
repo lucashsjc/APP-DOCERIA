@@ -368,7 +368,7 @@ legend {
   right: 0;
   bottom: 0;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   background: var(--superficie);
   border-top: 1px solid var(--borda);
   padding-bottom: env(safe-area-inset-bottom);
@@ -502,4 +502,81 @@ legend {
 .sem-link {
   text-decoration: none;
   color: inherit;
+}
+
+.cartao.apagado {
+  opacity: 0.65;
+}
+
+.calendario {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  padding: 8px;
+}
+
+.calendario-semana {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--suave);
+  padding: 4px 0;
+}
+
+.calendario-dia {
+  position: relative;
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.calendario-dia.hoje {
+  color: var(--marca);
+  font-weight: 700;
+  box-shadow: inset 0 0 0 2px var(--marca);
+}
+
+.calendario-dia.selecionado {
+  background: var(--marca);
+  color: var(--marca-texto);
+  font-weight: 700;
+}
+
+.calendario-qtd {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--marca-clara);
+  color: var(--marca);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+}
+
+.calendario-dia.selecionado .calendario-qtd {
+  background: var(--marca-texto);
+}
+
+.dia.hoje {
+  color: var(--marca);
+}
+
+.mais {
+  font-size: 26px;
+  line-height: 1;
+  text-decoration: none;
+  color: var(--marca);
+  padding: 4px 8px;
 }

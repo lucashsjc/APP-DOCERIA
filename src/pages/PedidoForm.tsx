@@ -27,7 +27,7 @@ export default function PedidoForm() {
   const [clienteId, setClienteId] = useState(busca.get('cliente') ?? '')
   const [novoNome, setNovoNome] = useState('')
   const [novoTelefone, setNovoTelefone] = useState('')
-  const [data, setData] = useState(hojeIso())
+  const [data, setData] = useState(busca.get('data') ?? hojeIso())
   const [horario, setHorario] = useState('')
   const [tipo, setTipo] = useState<TipoEntrega>('retirada')
   const [endereco, setEndereco] = useState('')

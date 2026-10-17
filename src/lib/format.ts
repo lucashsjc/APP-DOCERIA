@@ -22,11 +22,31 @@ function dataLocal(iso: string): Date {
   return new Date(ano, mes - 1, dia)
 }
 
-export function hojeIso(): string {
-  const d = new Date()
+export function isoDe(d: Date): string {
   const mes = String(d.getMonth() + 1).padStart(2, '0')
   const dia = String(d.getDate()).padStart(2, '0')
   return `${d.getFullYear()}-${mes}-${dia}`
+}
+
+export function hojeIso(): string {
+  return isoDe(new Date())
+}
+
+export function somarDias(iso: string, dias: number): string {
+  const d = dataLocal(iso)
+  d.setDate(d.getDate() + dias)
+  return isoDe(d)
+}
+
+/** "2026-10" + 1 → "2026-11" */
+export function somarMes(anoMes: string, delta: number): string {
+  const [ano, mes] = anoMes.split('-').map(Number)
+  return isoDe(new Date(ano, mes - 1 + delta, 1)).slice(0, 7)
+}
+
+/** 0 = domingo … 6 = sábado */
+export function diaDaSemana(iso: string): number {
+  return dataLocal(iso).getDay()
 }
 
 /** "sáb., 18 de out." */

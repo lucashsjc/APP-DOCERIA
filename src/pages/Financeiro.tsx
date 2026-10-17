@@ -4,14 +4,8 @@ import { Cabecalho, Estado } from '../components'
 import { repo } from '../data/repo'
 import { contaComoVenda, saldoPedido, totalPedido, type Cliente, type Pedido } from '../data/types'
 import { mensagemCobranca } from '../lib/cobranca'
-import { formatarMes, formatarMoeda, hojeIso, linkWhatsApp } from '../lib/format'
+import { formatarMes, formatarMoeda, hojeIso, linkWhatsApp, somarMes } from '../lib/format'
 import { useCarregar } from '../lib/useCarregar'
-
-function somarMes(anoMes: string, delta: number): string {
-  const [ano, mes] = anoMes.split('-').map(Number)
-  const d = new Date(ano, mes - 1 + delta, 1)
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
-}
 
 interface Devedor {
   cliente: Cliente
