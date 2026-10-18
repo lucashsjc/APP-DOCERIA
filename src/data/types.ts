@@ -71,6 +71,8 @@ export interface Produto {
   id: string
   nome: string
   preco: number
+  /** Caminho no armazenamento, ou endereço fixo do app (começa com "/") para as fotos do portfólio. */
+  foto: string | null
 }
 
 export type NovoCliente = Omit<Cliente, 'id'>

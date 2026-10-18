@@ -6,6 +6,7 @@ import { STATUS, STATUS_NOME, totalPedido, type Status } from '../data/types'
 import { formatarData, formatarMoeda, linkWhatsApp } from '../lib/format'
 import { compartilharImagem, gerarComprovante } from '../lib/comprovante'
 import { useCarregar } from '../lib/useCarregar'
+import { FotoProduto } from './Cardapio'
 import PagamentosPedido from './PagamentosPedido'
 
 export default function PedidoDetalhe() {
@@ -17,7 +18,9 @@ export default function PedidoDetalhe() {
     const pedido = await repo.buscarPedido(id!)
     if (!pedido) throw new Error('Pedido não encontrado.')
     const cliente = await repo.buscarCliente(pedido.cliente_id)
-    return { pedido, cliente }
+    // As fotos do cardápio são só enfeite: se falhar, o pedido aparece igual.
+    const produtos = await repo.listarProdutos().catch(() => [])
+    return { pedido, cliente, produtos }
   }, [id])
 
   const fotoPath = dados?.pedido.foto_path
@@ -34,7 +37,9 @@ export default function PedidoDetalhe() {
     )
   }
 
-  const { pedido, cliente } = dados
+  const { pedido, cliente, produtos } = dados
+  const produtoDoItem = (descricao: string) =>
+    produtos.find((p) => p.nome.toLocaleLowerCase('pt-BR') === descricao.trim().toLocaleLowerCase('pt-BR'))
 
   async function mudarStatus(status: Status) {
     const { id: _id, criado_em: _criado, ...resto } = pedido
@@ -121,8 +126,13 @@ export default function PedidoDetalhe() {
         {pedido.itens.length === 0 && <p className="suave">Nenhum item.</p>}
         {pedido.itens.map((item, i) => (
           <div key={i} className="linha">
-            <span>
-              {item.quantidade}× {item.descricao}
+            <span className="item-com-foto">
+              {produtoDoItem(item.descricao)?.foto && (
+                <FotoProduto produto={produtoDoItem(item.descricao)!} tamanho="mini" />
+              )}
+              <span>
+                {item.quantidade}× {item.descricao}
+              </span>
             </span>
             <span>{formatarMoeda(item.quantidade * item.valor_unitario)}</span>
           </div>

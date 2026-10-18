@@ -109,7 +109,7 @@ export function criarRepoSupabase(): Repo {
     },
 
     async listarProdutos() {
-      const { data, error } = await db.from('produtos').select('id, nome, preco').order('nome')
+      const { data, error } = await db.from('produtos').select('id, nome, preco, foto').order('nome')
       erro(error)
       return (data ?? []).map(lerProduto)
     },
@@ -117,7 +117,7 @@ export function criarRepoSupabase(): Repo {
       const consulta = id
         ? db.from('produtos').update(dados).eq('id', id)
         : db.from('produtos').insert(dados)
-      const { data, error } = await consulta.select('id, nome, preco').single()
+      const { data, error } = await consulta.select('id, nome, preco, foto').single()
       erro(error)
       return lerProduto(data!)
     },

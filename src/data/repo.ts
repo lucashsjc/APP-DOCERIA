@@ -31,3 +31,8 @@ export interface Repo {
 export const modoDemonstracao = !supabaseConfigurado
 
 export const repo: Repo = supabaseConfigurado ? criarRepoSupabase() : criarRepoLocal()
+
+/** Endereço para mostrar uma foto: as do portfólio vêm junto com o app; as outras, do armazenamento. */
+export function urlDaFoto(caminho: string): Promise<string> {
+  return caminho.startsWith('/') ? Promise.resolve(caminho) : repo.urlFoto(caminho)
+}
