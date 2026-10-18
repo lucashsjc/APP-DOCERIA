@@ -9,6 +9,8 @@ export default function ClienteForm() {
   const [nome, setNome] = useState('')
   const [telefone, setTelefone] = useState('')
   const [observacoes, setObservacoes] = useState('')
+  const [cpf, setCpf] = useState('')
+  const [endereco, setEndereco] = useState('')
   const [erro, setErro] = useState<string | null>(null)
   const [salvando, setSalvando] = useState(false)
 
@@ -21,6 +23,8 @@ export default function ClienteForm() {
         setNome(c.nome)
         setTelefone(c.telefone)
         setObservacoes(c.observacoes)
+        setCpf(c.cpf ?? '')
+        setEndereco(c.endereco ?? '')
       })
       .catch((e: Error) => setErro(e.message))
   }, [id])
@@ -31,7 +35,13 @@ export default function ClienteForm() {
     setErro(null)
     try {
       const salvo = await repo.salvarCliente(
-        { nome: nome.trim(), telefone: telefone.trim(), observacoes: observacoes.trim() },
+        {
+          nome: nome.trim(),
+          telefone: telefone.trim(),
+          observacoes: observacoes.trim(),
+          cpf: cpf.trim(),
+          endereco: endereco.trim(),
+        },
         id,
       )
       navegar(`/clientes/${salvo.id}`, { replace: true })
@@ -62,6 +72,18 @@ export default function ClienteForm() {
             placeholder="Preferências, alergias, como conheceu a loja…"
           />
         </label>
+        <fieldset className="grupo">
+          <legend>Para contratos (opcional)</legend>
+          <p className="suave">Só aparecem no contrato, nunca nas listas.</p>
+          <label>
+            CPF
+            <input inputMode="numeric" value={cpf} onChange={(e) => setCpf(e.target.value)} placeholder="000.000.000-00" />
+          </label>
+          <label>
+            Endereço
+            <input value={endereco} onChange={(e) => setEndereco(e.target.value)} placeholder="Rua, número, bairro, cidade" />
+          </label>
+        </fieldset>
         {erro && <p className="erro">{erro}</p>}
         <button className="botao primario" disabled={salvando}>
           {salvando ? 'Salvando…' : 'Salvar cliente'}

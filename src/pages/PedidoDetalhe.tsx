@@ -4,7 +4,7 @@ import { Cabecalho, Estado } from '../components'
 import { repo } from '../data/repo'
 import { STATUS, STATUS_NOME, totalPedido, type Status } from '../data/types'
 import { formatarData, formatarMoeda, linkWhatsApp } from '../lib/format'
-import { compartilharImagem, gerarComprovante } from '../lib/comprovante'
+import { compartilharArquivo, gerarComprovante } from '../lib/comprovante'
 import { useCarregar } from '../lib/useCarregar'
 import { FotoProduto } from './Cardapio'
 import PagamentosPedido from './PagamentosPedido'
@@ -54,7 +54,7 @@ export default function PedidoDetalhe() {
       const imagem = await gerarComprovante(pedido, cliente, pagamentos)
       const tipo = pedido.status === 'orcamento' ? 'orcamento' : 'pedido'
       const nome = (cliente?.nome.split(' ')[0] ?? 'cliente').toLocaleLowerCase('pt-BR')
-      await compartilharImagem(imagem, `${tipo}-${nome}-${pedido.data_entrega}.png`, `${tipo} ${cliente?.nome ?? ''}`)
+      await compartilharArquivo(imagem, `${tipo}-${nome}-${pedido.data_entrega}.png`, `${tipo} ${cliente?.nome ?? ''}`)
     } catch (e) {
       alert((e as Error).message)
     } finally {
@@ -169,6 +169,13 @@ export default function PedidoDetalhe() {
         <button className="botao primario" onClick={enviarComprovante} disabled={gerando}>
           {gerando ? 'Gerando imagem…' : pedido.status === 'orcamento' ? 'Enviar orçamento' : 'Enviar comprovante'}
         </button>
+        <Link className="botao" to={`/pedidos/${pedido.id}/contrato`}>
+          {pedido.contrato?.aceito_em
+            ? 'Contrato ✓ aceito'
+            : pedido.contrato?.enviado_em
+              ? 'Contrato (aguardando aceite)'
+              : 'Contrato'}
+        </Link>
         {cliente?.telefone && (
           <a className="botao" href={linkWhatsApp(cliente.telefone)} target="_blank" rel="noreferrer">
             WhatsApp de {cliente.nome.split(' ')[0]}

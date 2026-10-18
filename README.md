@@ -28,6 +28,14 @@ App (PWA) para a loja organizar pedidos, clientes, agenda e recebimentos. O plan
 - Cardápio: produtos com preço; no pedido, o nome é sugerido e o preço vem sozinho.
 - Produção (na Agenda): soma dos itens dos pedidos confirmados e em produção, do dia ou da semana.
 - Enviar orçamento/comprovante: gera uma imagem com o logo da loja e abre o compartilhar do celular.
+- Fotos dos produtos no cardápio (recortadas do portfólio) e miniaturas nos itens do pedido.
+
+**Contratos**
+- Dois modelos: encomenda de doces e locação de bolo cenográfico (texto da loja).
+- Preenchidos com os dados do pedido e do cliente (CPF e endereço opcionais, só no contrato),
+  com sinal de 50% e restante até a véspera calculados sozinhos.
+- Prévia na tela, PDF para enviar, mensagem pedindo "ACEITO" no WhatsApp e registro do aceite.
+- Dados da contratada e valores (reposição, multa, pedido mínimo) em `src/marca.ts`.
 
 ## Rodar no computador
 
@@ -43,7 +51,8 @@ Sem o Supabase configurado, o app abre em **modo demonstração**: os dados fica
 1. Crie um projeto em [supabase.com](https://supabase.com) (de preferência com o e-mail da dona).
 2. Em **SQL Editor**, cole o conteúdo de [`supabase/schema.sql`](supabase/schema.sql) e clique em **Run**.
    Depois, numa consulta nova de cada vez, faça o mesmo com [`supabase/002_pagamentos.sql`](supabase/002_pagamentos.sql)
-   e [`supabase/003_produtos.sql`](supabase/003_produtos.sql).
+   e [`supabase/003_produtos.sql`](supabase/003_produtos.sql), [`004_cardapio_inicial.sql`](supabase/004_cardapio_inicial.sql)
+   e [`005_contrato.sql`](supabase/005_contrato.sql).
 3. Em **Authentication → Sign In / Providers**, desligue **Allow new users to sign up**.
 4. Em **Authentication → Users**, clique em **Add user** e crie o usuário da dona com e-mail e senha.
 5. Copie `.env.example` para `.env.local` e preencha com a **Project URL** e a **anon key**

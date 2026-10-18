@@ -201,9 +201,9 @@ export async function gerarComprovante(
   )
 }
 
-/** Abre o menu de compartilhar do celular (WhatsApp etc.); no computador, baixa a imagem. */
-export async function compartilharImagem(imagem: Blob, nomeArquivo: string, titulo: string) {
-  const arquivo = new File([imagem], nomeArquivo, { type: 'image/png' })
+/** Abre o menu de compartilhar do celular (WhatsApp etc.); no computador, baixa o arquivo. */
+export async function compartilharArquivo(conteudo: Blob, nomeArquivo: string, titulo: string) {
+  const arquivo = new File([conteudo], nomeArquivo, { type: conteudo.type || 'application/octet-stream' })
   if (navigator.canShare?.({ files: [arquivo] })) {
     try {
       await navigator.share({ files: [arquivo], title: titulo })
@@ -213,7 +213,7 @@ export async function compartilharImagem(imagem: Blob, nomeArquivo: string, titu
     }
     return
   }
-  const url = URL.createObjectURL(imagem)
+  const url = URL.createObjectURL(conteudo)
   const link = document.createElement('a')
   link.href = url
   link.download = nomeArquivo

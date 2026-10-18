@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Cabecalho, Estado } from '../components'
 import { repo } from '../data/repo'
-import { STATUS, STATUS_NOME, totalPedido, type Cliente, type NovoPedido, type Produto, type Status, type TipoEntrega } from '../data/types'
+import { STATUS, STATUS_NOME, totalPedido, type Cliente, type DadosContrato, type NovoPedido, type Produto, type Status, type TipoEntrega } from '../data/types'
 import { formatarMoeda, hojeIso, lerMoeda, moedaParaCampo } from '../lib/format'
 import { reduzirFoto } from '../lib/imagem'
 
@@ -37,6 +37,8 @@ export default function PedidoForm() {
   const [taxa, setTaxa] = useState('')
   const [observacoes, setObservacoes] = useState('')
   const [status, setStatus] = useState<Status>('orcamento')
+  // O contrato é editado em outra tela; aqui só é preservado ao salvar.
+  const [contrato, setContrato] = useState<DadosContrato | null>(null)
   const [fotoPath, setFotoPath] = useState<string | null>(null)
   const [fotoNova, setFotoNova] = useState<Blob | null>(null)
   const [fotoUrl, setFotoUrl] = useState<string | null>(null)
@@ -67,6 +69,7 @@ export default function PedidoForm() {
         setTaxa(moedaParaCampo(p.taxa_entrega))
         setObservacoes(p.observacoes)
         setStatus(p.status)
+        setContrato(p.contrato ?? null)
         setFotoPath(p.foto_path)
         if (p.foto_path) setFotoUrl(await repo.urlFoto(p.foto_path))
       } else if (lista.length === 0) {
@@ -127,7 +130,13 @@ export default function PedidoForm() {
     try {
       let cliente = clienteId
       if (cliente === NOVO_CLIENTE) {
-        const novo = await repo.salvarCliente({ nome: novoNome.trim(), telefone: novoTelefone.trim(), observacoes: '' })
+        const novo = await repo.salvarCliente({
+          nome: novoNome.trim(),
+          telefone: novoTelefone.trim(),
+          observacoes: '',
+          cpf: '',
+          endereco: '',
+        })
         cliente = novo.id
       }
 
@@ -148,6 +157,7 @@ export default function PedidoForm() {
         observacoes: observacoes.trim(),
         foto_path: caminhoFoto,
         status,
+        contrato,
       }
       const salvo = await repo.salvarPedido(dados, id)
       if (fotoAntiga) await repo.excluirFoto(fotoAntiga).catch(() => {})

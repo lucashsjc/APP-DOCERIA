@@ -13,6 +13,7 @@ import ClienteForm from './pages/ClienteForm'
 import Financeiro from './pages/Financeiro'
 import Agenda from './pages/Agenda'
 import Cardapio from './pages/Cardapio'
+import ContratoPedido from './pages/ContratoPedido'
 import { IconeAgenda, IconeCardapio, IconeClientes, IconeFinanceiro, IconePedidos } from './icones'
 import { NOME_LOJA } from './marca'
 
@@ -65,6 +66,7 @@ export default function App() {
           <Route path="/pedidos/novo" element={<PedidoForm />} />
           <Route path="/pedidos/:id" element={<PedidoDetalhe />} />
           <Route path="/pedidos/:id/editar" element={<PedidoForm />} />
+          <Route path="/pedidos/:id/contrato" element={<ContratoPedido />} />
           <Route path="/clientes" element={<Clientes />} />
           <Route path="/clientes/novo" element={<ClienteForm />} />
           <Route path="/clientes/:id" element={<ClienteDetalhe />} />

@@ -25,6 +25,9 @@ export interface Cliente {
   nome: string
   telefone: string
   observacoes: string
+  /** Só para contratos; nunca aparece nas listas. */
+  cpf: string
+  endereco: string
 }
 
 export interface ItemPedido {
@@ -46,7 +49,30 @@ export interface Pedido {
   observacoes: string
   foto_path: string | null
   status: Status
+  contrato: DadosContrato | null
   criado_em: string
+}
+
+export type ModeloContrato = 'doces' | 'locacao'
+
+export const MODELO_NOME: Record<ModeloContrato, string> = {
+  doces: 'Encomenda de doces',
+  locacao: 'Locação de bolo cenográfico',
+}
+
+/** O que o contrato precisa além do que o pedido já tem. */
+export interface DadosContrato {
+  modelo: ModeloContrato
+  local: string
+  horario_entrega: string
+  /** Locação: descrição do bolo e do andar verdadeiro. */
+  objeto: string
+  acessorios: string
+  devolucao_data: string
+  devolucao_hora: string
+  enviado_em?: string
+  aceito_em?: string
+  aceite?: 'whatsapp' | 'govbr'
 }
 
 export const FORMAS_PAGAMENTO = ['pix', 'dinheiro', 'cartao'] as const
