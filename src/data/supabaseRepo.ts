@@ -37,6 +37,25 @@ function lerProduto(linha: Record<string, unknown>): Produto {
   return { ...p, preco: Number(p.preco) }
 }
 
+/**
+ * Grava a linha; se o banco ainda não tiver alguma coluna nova (SQL da atualização não rodado),
+ * tenta de novo sem as colunas opcionais, para o app continuar funcionando até o SQL ser rodado.
+ */
+async function gravarComColunasOpcionais<T extends object>(
+  gravar: (linha: T) => PromiseLike<{ data: unknown; error: { code?: string; message: string } | null }>,
+  linha: T,
+  opcionais: (keyof T)[],
+) {
+  let resultado = await gravar(linha)
+  if (resultado.error?.code === 'PGRST204') {
+    const semOpcionais = { ...linha }
+    for (const campo of opcionais) delete semOpcionais[campo]
+    resultado = await gravar(semOpcionais)
+  }
+  erro(resultado.error)
+  return resultado.data
+}
+
 export function criarRepoSupabase(): Repo {
   const db = supabase!
 
@@ -52,11 +71,12 @@ export function criarRepoSupabase(): Repo {
       return data as Cliente | null
     },
     async salvarCliente(dados, id) {
-      const consulta = id
-        ? db.from('clientes').update(dados).eq('id', id)
-        : db.from('clientes').insert(dados)
-      const { data, error } = await consulta.select().single()
-      erro(error)
+      const data = await gravarComColunasOpcionais(
+        (linha) =>
+          (id ? db.from('clientes').update(linha).eq('id', id) : db.from('clientes').insert(linha)).select().single(),
+        dados,
+        ['cpf', 'endereco'],
+      )
       return data as Cliente
     },
     async excluirCliente(id) {
@@ -78,13 +98,13 @@ export function criarRepoSupabase(): Repo {
       return data ? lerPedido(data) : null
     },
     async salvarPedido(dados, id) {
-      const linha = { ...dados, horario: dados.horario || null }
-      const consulta = id
-        ? db.from('pedidos').update(linha).eq('id', id)
-        : db.from('pedidos').insert(linha)
-      const { data, error } = await consulta.select().single()
-      erro(error)
-      return lerPedido(data)
+      const data = await gravarComColunasOpcionais(
+        (linha) =>
+          (id ? db.from('pedidos').update(linha).eq('id', id) : db.from('pedidos').insert(linha)).select().single(),
+        { ...dados, horario: dados.horario || null },
+        ['contrato'],
+      )
+      return lerPedido(data as Record<string, unknown>)
     },
     async excluirPedido(id) {
       const { error } = await db.from('pedidos').delete().eq('id', id)
