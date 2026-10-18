@@ -67,9 +67,16 @@ export interface Pagamento {
   forma: FormaPagamento
 }
 
+export interface Produto {
+  id: string
+  nome: string
+  preco: number
+}
+
 export type NovoCliente = Omit<Cliente, 'id'>
 export type NovoPedido = Omit<Pedido, 'id' | 'criado_em'>
 export type NovoPagamento = Omit<Pagamento, 'id'>
+export type NovoProduto = Omit<Produto, 'id'>
 
 export function totalPedido(p: Pick<Pedido, 'itens' | 'taxa_entrega'>): number {
   const itens = p.itens.reduce((soma, i) => soma + i.quantidade * i.valor_unitario, 0)

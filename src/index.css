@@ -165,7 +165,7 @@ button {
   right: 12px;
   bottom: calc(10px + env(safe-area-inset-bottom));
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   background: color-mix(in srgb, var(--superficie) 88%, transparent);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -180,9 +180,10 @@ button {
   flex-direction: column;
   align-items: center;
   gap: 2px;
+  min-width: 0;
   padding: 7px 0 6px;
   border-radius: 16px;
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 500;
   color: var(--suave);
   text-decoration: none;
@@ -800,6 +801,61 @@ legend {
 
 .calendario-dia.selecionado .calendario-qtd {
   background: var(--marca-texto);
+}
+
+/* ---------- Produção ---------- */
+.producao-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.producao-qtd {
+  flex: none;
+  min-width: 56px;
+  padding: 8px 10px;
+  border-radius: 14px;
+  background: var(--marca-clara);
+  color: var(--marca);
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.producao-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.producao-info a {
+  color: inherit;
+}
+
+/* ---------- Cardápio ---------- */
+.produto-form {
+  gap: 10px;
+}
+
+.produto-campos {
+  display: grid;
+  grid-template-columns: 1fr 110px;
+  gap: 10px;
+}
+
+.produto-botoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.cartao-botao {
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
 }
 
 /* ---------- Login ---------- */

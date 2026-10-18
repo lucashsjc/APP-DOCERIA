@@ -1,6 +1,6 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import type { Repo } from './repo'
-import type { Cliente, Pagamento, Pedido } from './types'
+import type { Cliente, Pagamento, Pedido, Produto } from './types'
 
 const url = import.meta.env.VITE_SUPABASE_URL as string | undefined
 const chave = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
@@ -30,6 +30,11 @@ function lerPedido(linha: Record<string, unknown>): Pedido {
 function lerPagamento(linha: Record<string, unknown>): Pagamento {
   const pg = linha as unknown as Pagamento
   return { ...pg, valor: Number(pg.valor) }
+}
+
+function lerProduto(linha: Record<string, unknown>): Produto {
+  const p = linha as unknown as Produto
+  return { ...p, preco: Number(p.preco) }
 }
 
 export function criarRepoSupabase(): Repo {
@@ -100,6 +105,24 @@ export function criarRepoSupabase(): Repo {
     },
     async excluirPagamento(id) {
       const { error } = await db.from('pagamentos').delete().eq('id', id)
+      erro(error)
+    },
+
+    async listarProdutos() {
+      const { data, error } = await db.from('produtos').select('id, nome, preco').order('nome')
+      erro(error)
+      return (data ?? []).map(lerProduto)
+    },
+    async salvarProduto(dados, id) {
+      const consulta = id
+        ? db.from('produtos').update(dados).eq('id', id)
+        : db.from('produtos').insert(dados)
+      const { data, error } = await consulta.select('id, nome, preco').single()
+      erro(error)
+      return lerProduto(data!)
+    },
+    async excluirProduto(id) {
+      const { error } = await db.from('produtos').delete().eq('id', id)
       erro(error)
     },
 

@@ -12,7 +12,8 @@ import ClienteDetalhe from './pages/ClienteDetalhe'
 import ClienteForm from './pages/ClienteForm'
 import Financeiro from './pages/Financeiro'
 import Agenda from './pages/Agenda'
-import { IconeAgenda, IconeClientes, IconeFinanceiro, IconePedidos } from './icones'
+import Cardapio from './pages/Cardapio'
+import { IconeAgenda, IconeCardapio, IconeClientes, IconeFinanceiro, IconePedidos } from './icones'
 import { NOME_LOJA } from './marca'
 
 export default function App() {
@@ -44,6 +45,10 @@ export default function App() {
             <IconeAgenda />
             Agenda
           </NavLink>
+          <NavLink to="/cardapio">
+            <IconeCardapio />
+            Cardápio
+          </NavLink>
           <NavLink to="/clientes">
             <IconeClientes />
             Clientes
@@ -66,6 +71,7 @@ export default function App() {
           <Route path="/clientes/:id/editar" element={<ClienteForm />} />
           <Route path="/financeiro" element={<Financeiro />} />
           <Route path="/agenda" element={<Agenda />} />
+          <Route path="/cardapio" element={<Cardapio />} />
         </Routes>
       </main>
     </HashRouter>

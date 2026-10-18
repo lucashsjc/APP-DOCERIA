@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Cabecalho, Estado } from '../components'
 import { repo } from '../data/repo'
-import { STATUS, STATUS_NOME, totalPedido, type Cliente, type NovoPedido, type Status, type TipoEntrega } from '../data/types'
+import { STATUS, STATUS_NOME, totalPedido, type Cliente, type NovoPedido, type Produto, type Status, type TipoEntrega } from '../data/types'
 import { formatarMoeda, hojeIso, lerMoeda, moedaParaCampo } from '../lib/format'
 import { reduzirFoto } from '../lib/imagem'
 
@@ -21,6 +21,7 @@ export default function PedidoForm() {
   const navegar = useNavigate()
 
   const [clientes, setClientes] = useState<Cliente[] | null>(null)
+  const [produtos, setProdutos] = useState<Produto[]>([])
   const [erro, setErro] = useState<string | null>(null)
   const [salvando, setSalvando] = useState(false)
 
@@ -42,6 +43,8 @@ export default function PedidoForm() {
 
   useEffect(() => {
     async function carregar() {
+      // O cardápio só ajuda a preencher; se falhar, o pedido continua funcionando.
+      repo.listarProdutos().then(setProdutos).catch(() => {})
       const lista = await repo.listarClientes()
       if (id) {
         const p = await repo.buscarPedido(id)
@@ -86,6 +89,23 @@ export default function PedidoForm() {
 
   function mudarItem(indice: number, campo: keyof ItemCampo, valor: string) {
     setItens(itens.map((item, i) => (i === indice ? { ...item, [campo]: valor } : item)))
+  }
+
+  /** Ao escolher um produto do cardápio, o preço vem junto (se ainda estiver vazio). */
+  function mudarDescricao(indice: number, descricao: string) {
+    const nome = descricao.trim().toLocaleLowerCase('pt-BR')
+    const produto = produtos.find((p) => p.nome.toLocaleLowerCase('pt-BR') === nome)
+    setItens(
+      itens.map((item, i) =>
+        i !== indice
+          ? item
+          : {
+              ...item,
+              descricao,
+              valor: produto && !item.valor ? moedaParaCampo(produto.preco) : item.valor,
+            },
+      ),
+    )
   }
 
   async function escolherFoto(arquivo: File | undefined) {
@@ -216,8 +236,9 @@ export default function PedidoForm() {
               <input
                 className="item-descricao"
                 placeholder="Ex.: Brigadeiro gourmet"
+                list="cardapio"
                 value={item.descricao}
-                onChange={(e) => mudarItem(i, 'descricao', e.target.value)}
+                onChange={(e) => mudarDescricao(i, e.target.value)}
               />
               <input
                 className="item-qtd"
@@ -244,6 +265,11 @@ export default function PedidoForm() {
               </button>
             </div>
           ))}
+          <datalist id="cardapio">
+            {produtos.map((p) => (
+              <option key={p.id} value={p.nome} />
+            ))}
+          </datalist>
           <button type="button" className="botao pequeno" onClick={() => setItens([...itens, itemVazio()])}>
             + Item
           </button>

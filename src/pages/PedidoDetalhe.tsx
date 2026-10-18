@@ -4,6 +4,7 @@ import { Cabecalho, Estado } from '../components'
 import { repo } from '../data/repo'
 import { STATUS, STATUS_NOME, totalPedido, type Status } from '../data/types'
 import { formatarData, formatarMoeda, linkWhatsApp } from '../lib/format'
+import { compartilharImagem, gerarComprovante } from '../lib/comprovante'
 import { useCarregar } from '../lib/useCarregar'
 import PagamentosPedido from './PagamentosPedido'
 
@@ -11,6 +12,7 @@ export default function PedidoDetalhe() {
   const { id } = useParams()
   const navegar = useNavigate()
   const [foto, setFoto] = useState<string | null>(null)
+  const [gerando, setGerando] = useState(false)
   const { dados, erro, recarregar } = useCarregar(async () => {
     const pedido = await repo.buscarPedido(id!)
     if (!pedido) throw new Error('Pedido não encontrado.')
@@ -38,6 +40,21 @@ export default function PedidoDetalhe() {
     const { id: _id, criado_em: _criado, ...resto } = pedido
     await repo.salvarPedido({ ...resto, status }, pedido.id)
     recarregar()
+  }
+
+  async function enviarComprovante() {
+    setGerando(true)
+    try {
+      const pagamentos = await repo.listarPagamentos(pedido.id)
+      const imagem = await gerarComprovante(pedido, cliente, pagamentos)
+      const tipo = pedido.status === 'orcamento' ? 'orcamento' : 'pedido'
+      const nome = (cliente?.nome.split(' ')[0] ?? 'cliente').toLocaleLowerCase('pt-BR')
+      await compartilharImagem(imagem, `${tipo}-${nome}-${pedido.data_entrega}.png`, `${tipo} ${cliente?.nome ?? ''}`)
+    } catch (e) {
+      alert((e as Error).message)
+    } finally {
+      setGerando(false)
+    }
   }
 
   async function excluir() {
@@ -139,6 +156,9 @@ export default function PedidoDetalhe() {
       )}
 
       <section className="acoes">
+        <button className="botao primario" onClick={enviarComprovante} disabled={gerando}>
+          {gerando ? 'Gerando imagem…' : pedido.status === 'orcamento' ? 'Enviar orçamento' : 'Enviar comprovante'}
+        </button>
         {cliente?.telefone && (
           <a className="botao" href={linkWhatsApp(cliente.telefone)} target="_blank" rel="noreferrer">
             WhatsApp de {cliente.nome.split(' ')[0]}

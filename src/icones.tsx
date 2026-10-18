@@ -63,6 +63,13 @@ export const IconeMoeda = () => (
   </Icone>
 )
 
+export const IconeCardapio = () => (
+  <Icone>
+    <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
+    <path d="M9 7h7M9 11h5" />
+  </Icone>
+)
+
 export const IconeMais = () => (
   <Icone>
     <path d="M12 5v14M5 12h14" />

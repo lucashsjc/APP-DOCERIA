@@ -1,5 +1,5 @@
 import type { Repo } from './repo'
-import type { Cliente, Pagamento, Pedido } from './types'
+import type { Cliente, Pagamento, Pedido, Produto } from './types'
 
 const CHAVE = 'doceria-demo'
 
@@ -7,17 +7,18 @@ interface Banco {
   clientes: Cliente[]
   pedidos: Pedido[]
   pagamentos: Pagamento[]
+  produtos: Produto[]
   fotos: Record<string, string>
 }
 
 function ler(): Banco {
   try {
     const salvo = localStorage.getItem(CHAVE)
-    if (salvo) return { pagamentos: [], ...JSON.parse(salvo) }
+    if (salvo) return { pagamentos: [], produtos: [], ...JSON.parse(salvo) }
   } catch {
     // sem armazenamento: começa vazio
   }
-  return { clientes: [], pedidos: [], pagamentos: [], fotos: {} }
+  return { clientes: [], pedidos: [], pagamentos: [], produtos: [], fotos: {} }
 }
 
 function gravar(banco: Banco) {
@@ -99,6 +100,22 @@ export function criarRepoLocal(): Repo {
     async excluirPagamento(id) {
       const banco = ler()
       banco.pagamentos = banco.pagamentos.filter((pg) => pg.id !== id)
+      gravar(banco)
+    },
+
+    async listarProdutos() {
+      return ler().produtos.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'))
+    },
+    async salvarProduto(dados, id) {
+      const banco = ler()
+      const produto: Produto = { ...dados, id: id ?? crypto.randomUUID() }
+      banco.produtos = [...banco.produtos.filter((p) => p.id !== produto.id), produto]
+      gravar(banco)
+      return produto
+    },
+    async excluirProduto(id) {
+      const banco = ler()
+      banco.produtos = banco.produtos.filter((p) => p.id !== id)
       gravar(banco)
     },
 
