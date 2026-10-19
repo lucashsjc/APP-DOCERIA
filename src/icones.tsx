@@ -18,13 +18,6 @@ function Icone({ children }: { children: ReactNode }) {
   )
 }
 
-export const IconePedidos = () => (
-  <Icone>
-    <rect x="8" y="2" width="8" height="4" rx="1" />
-    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-    <path d="M9 12h6M9 16h4" />
-  </Icone>
-)
 
 export const IconeAgenda = () => (
   <Icone>
@@ -48,13 +41,6 @@ export const IconeFinanceiro = () => (
   </Icone>
 )
 
-export const IconeBolo = () => (
-  <Icone>
-    <path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8" />
-    <path d="M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2.5 2 4 2 2-1 2-1" />
-    <path d="M2 21h20M7 8v3M12 8v3M17 8v3M7 4h.01M12 4h.01M17 4h.01" />
-  </Icone>
-)
 
 export const IconeMoeda = () => (
   <Icone>
@@ -73,5 +59,30 @@ export const IconeCardapio = () => (
 export const IconeMais = () => (
   <Icone>
     <path d="M12 5v14M5 12h14" />
+  </Icone>
+)
+
+export const IconeInicio = () => (
+  <Icone>
+    <path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z" />
+  </Icone>
+)
+
+export const IconeSino = () => (
+  <Icone>
+    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+    <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+  </Icone>
+)
+
+export const IconeProducao = () => (
+  <Icone>
+    <path d="M9 11V3h6v8M5 11h14l-1 10H6z" />
+  </Icone>
+)
+
+export const IconeSeta = () => (
+  <Icone>
+    <path d="M7 17 17 7M8 7h9v9" />
   </Icone>
 )

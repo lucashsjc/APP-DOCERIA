@@ -20,9 +20,12 @@ export default function Login() {
   return (
     <main className="login">
       <section className="login-texto">
-        <div>
-          <span className="logo">{NOME_LOJA}</span>
-          <div className="subtitulo-loja">{SUBTITULO_LOJA}</div>
+        <div className="saudacao">
+          <img className="avatar-loja" src="/logo-loja.jpg" alt="" />
+          <div>
+            <span className="suave">{SUBTITULO_LOJA}</span>
+            <strong>{NOME_LOJA}</strong>
+          </div>
         </div>
         <h1>Seus pedidos, sempre organizados.</h1>
         <p className="suave">Pedidos, clientes, agenda e recebimentos da loja em um só lugar.</p>

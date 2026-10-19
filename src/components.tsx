@@ -52,3 +52,15 @@ export function CartaoPedido({ pedido, cliente, saldo }: { pedido: Pedido; clien
     </Link>
   )
 }
+
+/** Valor em reais com os centavos mais apagados, como no visual de app de banco. */
+export function Valor({ valor, className }: { valor: number; className?: string }) {
+  const texto = formatarMoeda(valor)
+  const virgula = texto.lastIndexOf(',')
+  return (
+    <span className={className ? `valor ${className}` : 'valor'}>
+      {texto.slice(0, virgula)}
+      <span className="centavos">{texto.slice(virgula)}</span>
+    </span>
+  )
+}

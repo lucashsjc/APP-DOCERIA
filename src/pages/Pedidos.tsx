@@ -3,8 +3,7 @@ import { Link } from 'react-router-dom'
 import { Cabecalho, CartaoPedido, Estado } from '../components'
 import { repo } from '../data/repo'
 import { saldoPedido, type Pedido } from '../data/types'
-import { IconeAgenda, IconeBolo, IconeMoeda } from '../icones'
-import { formatarDataRelativa, formatarMoeda, hojeIso, somarDias } from '../lib/format'
+import { formatarDataRelativa, hojeIso } from '../lib/format'
 import { useCarregar } from '../lib/useCarregar'
 
 const FILTROS = {
@@ -49,47 +48,17 @@ export default function Pedidos() {
 
   const hoje = hojeIso()
 
-  const resumo = useMemo(() => {
-    if (!dados) return null
-    const [pedidos, , pagamentos] = dados
-    const ativos = pedidos.filter((p) => p.status !== 'cancelado' && p.status !== 'entregue')
-    const daqui7 = somarDias(hoje, 7)
-    return {
-      hoje: ativos.filter((p) => p.data_entrega === hoje).length,
-      semana: ativos.filter((p) => p.data_entrega > hoje && p.data_entrega <= daqui7).length,
-      aReceber: pedidos.reduce((s, p) => s + saldoPedido(p, pagamentos), 0),
-    }
-  }, [dados, hoje])
-
   return (
     <>
       <Cabecalho
         titulo="Pedidos"
+        voltar
         acao={
           <Link to="/pedidos/novo" className="botao primario pequeno">
             + Novo
           </Link>
         }
       />
-      {resumo && (
-        <div className="resumo">
-          <Link to={`/agenda?dia=${hoje}`} className="resumo-cartao">
-            <IconeBolo />
-            <strong>{resumo.hoje}</strong>
-            <span>{resumo.hoje === 1 ? 'pedido hoje' : 'pedidos hoje'}</span>
-          </Link>
-          <Link to="/agenda?visao=semana" className="resumo-cartao">
-            <IconeAgenda />
-            <strong>{resumo.semana}</strong>
-            <span>nos próximos 7 dias</span>
-          </Link>
-          <Link to="/financeiro" className="resumo-cartao">
-            <IconeMoeda />
-            <strong>{formatarMoeda(resumo.aReceber)}</strong>
-            <span>a receber</span>
-          </Link>
-        </div>
-      )}
       <input
         className="busca"
         type="search"

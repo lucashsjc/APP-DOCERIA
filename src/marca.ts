@@ -3,6 +3,8 @@
 // e "name"/"short_name" em public/manifest.webmanifest.
 export const NOME_LOJA = 'Doce Festa'
 export const SUBTITULO_LOJA = 'Confeitaria Artística'
+/** Nome da dona, usado na saudação da tela inicial. */
+export const NOME_DONA = 'Pamela'
 
 // Dados usados nos contratos. Os da contratada ficam em branco (linha para preencher
 // à mão) enquanto não forem informados.
