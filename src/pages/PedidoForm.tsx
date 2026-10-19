@@ -5,6 +5,7 @@ import { repo } from '../data/repo'
 import { STATUS, STATUS_NOME, totalPedido, type Cliente, type DadosContrato, type NovoPedido, type Produto, type Status, type TipoEntrega } from '../data/types'
 import { formatarMoeda, hojeIso, lerMoeda, moedaParaCampo } from '../lib/format'
 import { reduzirFoto } from '../lib/imagem'
+import SeletorCardapio from './SeletorCardapio'
 
 interface ItemCampo {
   descricao: string
@@ -21,7 +22,9 @@ export default function PedidoForm() {
   const navegar = useNavigate()
 
   const [clientes, setClientes] = useState<Cliente[] | null>(null)
-  const [produtos, setProdutos] = useState<Produto[]>([])
+  const [produtos, setProdutos] = useState<Produto[] | null>(null)
+  const [erroCardapio, setErroCardapio] = useState<string | null>(null)
+  const [escolhendo, setEscolhendo] = useState(false)
   const [erro, setErro] = useState<string | null>(null)
   const [salvando, setSalvando] = useState(false)
 
@@ -46,7 +49,10 @@ export default function PedidoForm() {
   useEffect(() => {
     async function carregar() {
       // O cardápio só ajuda a preencher; se falhar, o pedido continua funcionando.
-      repo.listarProdutos().then(setProdutos).catch(() => {})
+      repo
+        .listarProdutos()
+        .then(setProdutos)
+        .catch((e: Error) => setErroCardapio(e.message))
       const lista = await repo.listarClientes()
       if (id) {
         const p = await repo.buscarPedido(id)
@@ -94,10 +100,19 @@ export default function PedidoForm() {
     setItens(itens.map((item, i) => (i === indice ? { ...item, [campo]: valor } : item)))
   }
 
+  const normalizar = (texto: string) => texto.trim().toLocaleLowerCase('pt-BR')
+
+  /** Adiciona o produto escolhido na janela do cardápio, ocupando uma linha vazia se houver. */
+  function adicionarDoCardapio(produto: Produto) {
+    const novo: ItemCampo = { descricao: produto.nome, quantidade: '1', valor: moedaParaCampo(produto.preco) }
+    const vazia = itens.findIndex((i) => !i.descricao.trim() && !i.valor.trim())
+    setItens(vazia >= 0 ? itens.map((item, i) => (i === vazia ? novo : item)) : [...itens, novo])
+  }
+
   /** Ao escolher um produto do cardápio, o preço vem junto (se ainda estiver vazio). */
   function mudarDescricao(indice: number, descricao: string) {
     const nome = descricao.trim().toLocaleLowerCase('pt-BR')
-    const produto = produtos.find((p) => p.nome.toLocaleLowerCase('pt-BR') === nome)
+    const produto = produtos?.find((p) => p.nome.toLocaleLowerCase('pt-BR') === nome)
     setItens(
       itens.map((item, i) =>
         i !== indice
@@ -276,14 +291,29 @@ export default function PedidoForm() {
             </div>
           ))}
           <datalist id="cardapio">
-            {produtos.map((p) => (
+            {(produtos ?? []).map((p) => (
               <option key={p.id} value={p.nome} />
             ))}
           </datalist>
-          <button type="button" className="botao pequeno" onClick={() => setItens([...itens, itemVazio()])}>
-            + Item
-          </button>
+          <div className="dupla">
+            <button type="button" className="botao primario pequeno" onClick={() => setEscolhendo(true)}>
+              Escolher do cardápio
+            </button>
+            <button type="button" className="botao pequeno" onClick={() => setItens([...itens, itemVazio()])}>
+              + Item avulso
+            </button>
+          </div>
         </fieldset>
+
+        {escolhendo && (
+          <SeletorCardapio
+            produtos={produtos}
+            erro={erroCardapio}
+            jaNoPedido={(nome) => itens.some((i) => normalizar(i.descricao) === normalizar(nome))}
+            aoEscolher={adicionarDoCardapio}
+            aoFechar={() => setEscolhendo(false)}
+          />
+        )}
 
         {tipo === 'entrega' && (
           <label>
