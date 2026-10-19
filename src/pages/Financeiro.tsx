@@ -54,7 +54,14 @@ export default function Financeiro() {
 
   return (
     <>
-      <Cabecalho titulo="Financeiro" />
+      <Cabecalho
+        titulo="Financeiro"
+        acao={
+          <Link to="/relatorios" className="botao pequeno">
+            Relatórios
+          </Link>
+        }
+      />
       <div className="mes">
         <button aria-label="Mês anterior" onClick={() => setMes(somarMes(mes, -1))}>
           ‹

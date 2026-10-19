@@ -17,6 +17,8 @@
   --sucesso: #2f9e5a;
   --aviso: #c26a12;
   --raio: 26px;
+  /* Cor das barras dos gráficos: rosa mais escuro, validado (contraste e faixa de luminosidade). */
+  --grafico: #d94a8c;
   --raio-p: 18px;
 
   /* compatibilidade com nomes usados pelas telas */
@@ -52,6 +54,7 @@
     --preto-2: #18181c;
     --marca: #f3f3f5;
     --marca-texto: #141416;
+    --grafico: #e0609a;
     color-scheme: dark;
   }
 }
@@ -1295,4 +1298,138 @@ legend {
 .grupo .botao:not(.primario),
 .cartao-login .botao:not(.primario) {
   background: var(--superficie-2);
+}
+
+/* ---------- Relatórios ---------- */
+.grafico svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.grafico-barra {
+  fill: var(--grafico);
+  transition: opacity 0.15s ease;
+}
+
+.grafico-barra.apagada {
+  opacity: 0.35;
+}
+
+.grafico-grade {
+  stroke: var(--borda);
+  stroke-width: 1;
+}
+
+.grafico-eixo {
+  fill: var(--suave);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.grafico-valor {
+  fill: var(--texto);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.grafico rect:focus {
+  outline: none;
+}
+
+.grafico-dica {
+  min-height: 20px;
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--suave);
+}
+
+.grafico-dica strong {
+  color: var(--texto);
+}
+
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.tabela th,
+.tabela td {
+  padding: 8px 4px;
+  text-align: left;
+  border-bottom: 1px solid var(--borda);
+}
+
+.tabela th {
+  color: var(--suave);
+  font-weight: 600;
+}
+
+.tabela td:first-child::first-letter {
+  text-transform: uppercase;
+}
+
+.tabela th:not(:first-child),
+.tabela td:not(:first-child) {
+  text-align: right;
+}
+
+.ranking {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 0;
+}
+
+.ranking + .ranking {
+  border-top: 1px solid var(--borda);
+}
+
+.ranking-posicao {
+  width: 18px;
+  flex: none;
+  text-align: center;
+  font-weight: 700;
+  color: var(--suave);
+}
+
+.ranking-texto {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ranking-texto strong {
+  font-size: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ranking-barra {
+  display: block;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--superficie-2);
+  overflow: hidden;
+}
+
+.ranking-barra span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--grafico);
+}
+
+.ranking-valores {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  font-variant-numeric: tabular-nums;
 }

@@ -14,6 +14,7 @@ import ClienteForm from './pages/ClienteForm'
 import Financeiro from './pages/Financeiro'
 import Agenda from './pages/Agenda'
 import Cardapio from './pages/Cardapio'
+import Relatorios from './pages/Relatorios'
 import ContratoPedido from './pages/ContratoPedido'
 import { IconeAgenda, IconeCardapio, IconeClientes, IconeFinanceiro, IconeInicio } from './icones'
 
@@ -50,6 +51,7 @@ export default function App() {
           <Route path="/financeiro" element={<Financeiro />} />
           <Route path="/agenda" element={<Agenda />} />
           <Route path="/cardapio" element={<Cardapio />} />
+          <Route path="/relatorios" element={<Relatorios />} />
         </Routes>
       </main>
       <nav className="abas" aria-label="Menu">

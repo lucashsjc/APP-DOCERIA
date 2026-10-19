@@ -37,6 +37,11 @@ App (PWA) para a loja organizar pedidos, clientes, agenda e recebimentos. O plan
 - Prévia na tela, PDF para enviar, mensagem pedindo "ACEITO" no WhatsApp e registro do aceite.
 - Dados da contratada e valores (reposição, multa, pedido mínimo) em `src/marca.ts`.
 
+**Relatórios** (Financeiro → Relatórios)
+- Faturamento, número de pedidos e ticket médio dos últimos 6 ou 12 meses.
+- Gráfico do vendido por mês (toque numa coluna para ver o valor) e versão em tabela.
+- Produtos mais vendidos, por quantidade ou por faturamento.
+
 ## Rodar no computador
 
 ```bash
