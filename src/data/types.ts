@@ -99,6 +99,11 @@ export interface Produto {
   preco: number
   /** Caminho no armazenamento, ou endereço fixo do app (começa com "/") para as fotos do portfólio. */
   foto: string | null
+  /** Seção do cardápio, ex.: "Brigadeiros especiais". Vazio = "Outros". */
+  categoria: string
+  descricao: string
+  /** "cento": preço é por unidade, mas o cardápio mostra o cento e o meio cento. */
+  unidade: 'un' | 'cento'
 }
 
 export type NovoCliente = Omit<Cliente, 'id'>

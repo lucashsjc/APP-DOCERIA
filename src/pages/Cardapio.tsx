@@ -1,13 +1,15 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Cabecalho, Estado } from '../components'
 import { repo, urlDaFoto } from '../data/repo'
 import type { Produto } from '../data/types'
 import { formatarMoeda, lerMoeda, moedaParaCampo } from '../lib/format'
 import { reduzirFoto } from '../lib/imagem'
 import { useCarregar } from '../lib/useCarregar'
+import { agruparPorSecao, precoDeVitrine, SECOES_CARDAPIO, SEM_CATEGORIA } from '../lib/categorias'
+import { NOME_LOJA, SUBTITULO_LOJA } from '../marca'
 
 /** Foto redonda do produto, como no portfólio. Sem foto, mostra a inicial. */
-export function FotoProduto({ produto, tamanho = 'grande' }: { produto: Pick<Produto, 'nome' | 'foto'>; tamanho?: 'grande' | 'mini' }) {
+export function FotoProduto({ produto, tamanho = 'grande' }: { produto: Pick<Produto, 'nome' | 'foto'>; tamanho?: 'grande' | 'media' | 'mini' }) {
   const [url, setUrl] = useState<string | null>(null)
   useEffect(() => {
     let ativo = true
@@ -26,15 +28,20 @@ export function FotoProduto({ produto, tamanho = 'grande' }: { produto: Pick<Pro
 
 function FormProduto({
   inicial,
+  categorias,
   aoSalvar,
   aoCancelar,
 }: {
   inicial?: Produto
+  categorias: string[]
   aoSalvar: () => void
   aoCancelar?: () => void
 }) {
   const [nome, setNome] = useState(inicial?.nome ?? '')
   const [preco, setPreco] = useState(inicial ? moedaParaCampo(inicial.preco) : '')
+  const [categoria, setCategoria] = useState(inicial?.categoria ?? '')
+  const [descricao, setDescricao] = useState(inicial?.descricao ?? '')
+  const [unidade, setUnidade] = useState<Produto['unidade']>(inicial?.unidade ?? 'un')
   const [foto, setFoto] = useState<string | null>(inicial?.foto ?? null)
   const [fotoNova, setFotoNova] = useState<Blob | null>(null)
   const [previa, setPrevia] = useState<string | null>(null)
@@ -63,13 +70,24 @@ function FormProduto({
     setSalvando(true)
     try {
       const caminho = fotoNova ? await repo.enviarFoto(fotoNova) : foto
-      await repo.salvarProduto({ nome: nome.trim(), preco: lerMoeda(preco), foto: caminho }, inicial?.id)
+      await repo.salvarProduto(
+        {
+          nome: nome.trim(),
+          preco: lerMoeda(preco),
+          foto: caminho,
+          categoria: categoria.trim(),
+          descricao: descricao.trim(),
+          unidade,
+        },
+        inicial?.id,
+      )
       // A foto antiga só sai do armazenamento se era uma enviada por ela (não as do portfólio).
       const antiga = inicial?.foto
       if (antiga && antiga !== caminho && !antiga.startsWith('/')) await repo.excluirFoto(antiga).catch(() => {})
       if (!inicial) {
         setNome('')
         setPreco('')
+        setDescricao('')
         tirarFoto()
       }
       aoSalvar()
@@ -87,6 +105,9 @@ function FormProduto({
     aoSalvar()
   }
 
+  const valor = lerMoeda(preco)
+  const idLista = `categorias-${inicial?.id ?? 'novo'}`
+
   return (
     <form className="formulario produto-form" onSubmit={salvar}>
       <div className="produto-foto-campo">
@@ -103,16 +124,51 @@ function FormProduto({
           )}
         </div>
       </div>
+      <label>
+        Produto
+        <input value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Ex.: Trufa 2D" required />
+      </label>
+      <label>
+        Seção do cardápio
+        <input
+          list={idLista}
+          value={categoria}
+          onChange={(e) => setCategoria(e.target.value)}
+          placeholder="Ex.: Doces 3D"
+        />
+        <datalist id={idLista}>
+          {categorias.map((c) => (
+            <option key={c} value={c} />
+          ))}
+        </datalist>
+      </label>
+      <label>
+        Descrição
+        <textarea
+          rows={3}
+          value={descricao}
+          onChange={(e) => setDescricao(e.target.value)}
+          placeholder="Ex.: Sabores ninho, maracujá ou chocolate"
+        />
+      </label>
       <div className="produto-campos">
         <label>
-          Produto
-          <input value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Ex.: Trufa 2D" required />
+          Vende por
+          <select value={unidade} onChange={(e) => setUnidade(e.target.value as Produto['unidade'])}>
+            <option value="un">Unidade</option>
+            <option value="cento">Cento</option>
+          </select>
         </label>
         <label>
-          Preço (R$)
+          Preço da unidade (R$)
           <input inputMode="decimal" value={preco} onChange={(e) => setPreco(e.target.value)} placeholder="0,00" />
         </label>
       </div>
+      {unidade === 'cento' && valor > 0 && (
+        <p className="dica">
+          No cardápio: {formatarMoeda(valor * 100)} o cento · {formatarMoeda(valor * 50)} meio cento
+        </p>
+      )}
       <div className="produto-botoes">
         {inicial && (
           <button type="button" className="botao pequeno perigo" onClick={excluir}>
@@ -132,14 +188,49 @@ function FormProduto({
   )
 }
 
+function ItemCardapio({ produto, aoTocar }: { produto: Produto; aoTocar: () => void }) {
+  const preco = precoDeVitrine(produto)
+  return (
+    <button className="item-cardapio" onClick={aoTocar}>
+      <FotoProduto produto={produto} tamanho="media" />
+      <span className="item-cardapio-texto">
+        <strong>{produto.nome}</strong>
+        {produto.descricao && <span className="item-cardapio-descricao">{produto.descricao}</span>}
+        <span className="item-cardapio-preco">
+          <b>{preco.principal}</b>
+          {preco.secundario && <span>{preco.secundario}</span>}
+        </span>
+      </span>
+    </button>
+  )
+}
+
 export default function Cardapio() {
   const { dados: produtos, erro, recarregar } = useCarregar(() => repo.listarProdutos(), [])
   const [editando, setEditando] = useState<string | null>(null)
   const [novo, setNovo] = useState(false)
   const [busca, setBusca] = useState('')
+  const [secao, setSecao] = useState<string | null>(null)
+
+  const secoes = useMemo(() => agruparPorSecao(produtos ?? []), [produtos])
+  const categorias = useMemo(
+    () => [...new Set([...SECOES_CARDAPIO.map((s) => s.nome), ...secoes.map((s) => s.nome)])].filter((c) => c !== SEM_CATEGORIA),
+    [secoes],
+  )
 
   const termo = busca.trim().toLocaleLowerCase('pt-BR')
-  const lista = (produtos ?? []).filter((p) => !termo || p.nome.toLocaleLowerCase('pt-BR').includes(termo))
+  const visiveis = secoes
+    .filter((s) => !secao || s.nome === secao)
+    .map((s) => ({
+      ...s,
+      produtos: s.produtos.filter(
+        (p) =>
+          !termo ||
+          p.nome.toLocaleLowerCase('pt-BR').includes(termo) ||
+          p.descricao.toLocaleLowerCase('pt-BR').includes(termo),
+      ),
+    }))
+    .filter((s) => s.produtos.length > 0)
 
   return (
     <>
@@ -154,10 +245,21 @@ export default function Cardapio() {
         }
       />
 
+      <section className="capa-cardapio">
+        <img src="/logo-loja.jpg" alt="" />
+        <div>
+          <span className="capa-cardapio-loja">{NOME_LOJA}</span>
+          <span className="capa-cardapio-sub">
+            {SUBTITULO_LOJA} · {produtos ? `${produtos.length} ${produtos.length === 1 ? 'produto' : 'produtos'}` : '…'}
+          </span>
+        </div>
+      </section>
+
       {novo && (
         <section className="bloco">
           <h2>Novo produto</h2>
           <FormProduto
+            categorias={categorias}
             aoSalvar={() => {
               setNovo(false)
               recarregar()
@@ -175,33 +277,52 @@ export default function Cardapio() {
         onChange={(e) => setBusca(e.target.value)}
       />
 
+      {secoes.length > 1 && (
+        <div className="chips" role="tablist" aria-label="Seções do cardápio">
+          <button className={secao === null ? 'chip ativo' : 'chip'} onClick={() => setSecao(null)}>
+            Tudo
+          </button>
+          {secoes.map((s) => (
+            <button key={s.nome} className={secao === s.nome ? 'chip ativo' : 'chip'} onClick={() => setSecao(s.nome)}>
+              {s.nome}
+            </button>
+          ))}
+        </div>
+      )}
+
       <Estado erro={erro} carregando={!produtos} />
       {produtos && produtos.length === 0 && (
         <p className="vazio">Nenhum produto cadastrado ainda. Toque em "+ Novo" para começar.</p>
       )}
+      {produtos && produtos.length > 0 && visiveis.length === 0 && <p className="vazio">Nada encontrado.</p>}
 
-      <div className="vitrine">
-        {lista.map((p) =>
-          editando === p.id ? (
-            <div key={p.id} className="cartao vitrine-edicao">
-              <FormProduto
-                inicial={p}
-                aoSalvar={() => {
-                  setEditando(null)
-                  recarregar()
-                }}
-                aoCancelar={() => setEditando(null)}
-              />
-            </div>
-          ) : (
-            <button key={p.id} className="cartao vitrine-item" onClick={() => setEditando(p.id)}>
-              <FotoProduto produto={p} />
-              <strong>{p.nome}</strong>
-              <span className="vitrine-preco">{formatarMoeda(p.preco)}</span>
-            </button>
-          ),
-        )}
-      </div>
+      {visiveis.map((s) => (
+        <section key={s.nome} className="secao-cardapio">
+          <header>
+            <h2>{s.nome}</h2>
+            {s.descricao && <p>{s.descricao}</p>}
+          </header>
+          <div className="cartao lista-cardapio">
+            {s.produtos.map((p) =>
+              editando === p.id ? (
+                <div key={p.id} className="item-cardapio-edicao">
+                  <FormProduto
+                    inicial={p}
+                    categorias={categorias}
+                    aoSalvar={() => {
+                      setEditando(null)
+                      recarregar()
+                    }}
+                    aoCancelar={() => setEditando(null)}
+                  />
+                </div>
+              ) : (
+                <ItemCardapio key={p.id} produto={p} aoTocar={() => setEditando(p.id)} />
+              ),
+            )}
+          </div>
+        </section>
+      ))}
     </>
   )
 }

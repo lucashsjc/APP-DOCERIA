@@ -34,7 +34,14 @@ function lerPagamento(linha: Record<string, unknown>): Pagamento {
 
 function lerProduto(linha: Record<string, unknown>): Produto {
   const p = linha as unknown as Produto
-  return { ...p, preco: Number(p.preco) }
+  // As colunas categoria/descricao/unidade só existem depois do SQL 006.
+  return {
+    ...p,
+    preco: Number(p.preco),
+    categoria: p.categoria ?? '',
+    descricao: p.descricao ?? '',
+    unidade: p.unidade === 'cento' ? 'cento' : 'un',
+  }
 }
 
 /**
@@ -129,17 +136,18 @@ export function criarRepoSupabase(): Repo {
     },
 
     async listarProdutos() {
-      const { data, error } = await db.from('produtos').select('id, nome, preco, foto').order('nome')
+      const { data, error } = await db.from('produtos').select('*').order('nome')
       erro(error)
       return (data ?? []).map(lerProduto)
     },
     async salvarProduto(dados, id) {
-      const consulta = id
-        ? db.from('produtos').update(dados).eq('id', id)
-        : db.from('produtos').insert(dados)
-      const { data, error } = await consulta.select('id, nome, preco, foto').single()
-      erro(error)
-      return lerProduto(data!)
+      const data = await gravarComColunasOpcionais(
+        (linha) =>
+          (id ? db.from('produtos').update(linha).eq('id', id) : db.from('produtos').insert(linha)).select('*').single(),
+        dados,
+        ['categoria', 'descricao', 'unidade'],
+      )
+      return lerProduto(data as Record<string, unknown>)
     },
     async excluirProduto(id) {
       const { error } = await db.from('produtos').delete().eq('id', id)

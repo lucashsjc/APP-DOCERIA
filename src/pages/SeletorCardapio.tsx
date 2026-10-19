@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { Produto } from '../data/types'
 import { formatarMoeda } from '../lib/format'
+import { agruparPorSecao } from '../lib/categorias'
 import { FotoProduto } from './Cardapio'
 
 /**
@@ -63,22 +64,29 @@ export default function SeletorCardapio({
           {!erro && produtos?.length === 0 && (
             <p className="vazio">O cardápio está vazio. Cadastre os produtos na aba Cardápio.</p>
           )}
-          {lista.map((p) => {
-            const adicionado = jaNoPedido(p.nome)
-            return (
-              <button
-                key={p.id}
-                type="button"
-                className={adicionado ? 'opcao-produto adicionado' : 'opcao-produto'}
-                onClick={() => !adicionado && aoEscolher(p)}
-                aria-pressed={adicionado}
-              >
-                <FotoProduto produto={p} tamanho="mini" />
-                <span className="opcao-nome">{p.nome}</span>
-                <span className="opcao-preco">{adicionado ? '✓ No pedido' : formatarMoeda(p.preco)}</span>
-              </button>
-            )
-          })}
+          {agruparPorSecao(lista).map((secao) => (
+            <div key={secao.nome} className="janela-secao">
+              <h3>{secao.nome}</h3>
+              {secao.produtos.map((p) => {
+                const adicionado = jaNoPedido(p.nome)
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    className={adicionado ? 'opcao-produto adicionado' : 'opcao-produto'}
+                    onClick={() => !adicionado && aoEscolher(p)}
+                    aria-pressed={adicionado}
+                  >
+                    <FotoProduto produto={p} tamanho="mini" />
+                    <span className="opcao-nome">{p.nome}</span>
+                    <span className="opcao-preco">
+                      {adicionado ? '✓ No pedido' : `${formatarMoeda(p.preco)}${p.unidade === 'cento' ? ' un.' : ''}`}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          ))}
         </div>
       </section>
     </div>

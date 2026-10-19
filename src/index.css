@@ -1079,40 +1079,160 @@ legend {
   font-size: 14px;
 }
 
-.vitrine {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+.foto-produto.media {
+  width: 76px;
+  height: 76px;
+  font-size: 26px;
 }
 
-.vitrine-item {
+.capa-cardapio {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  margin-bottom: 14px;
+  border-radius: var(--raio);
+  background: var(--preto);
+  color: #ffffff;
+}
+
+.capa-cardapio img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: none;
+  border: 3px solid var(--rosa);
+}
+
+.capa-cardapio div {
   display: flex;
   flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.capa-cardapio-loja {
+  font-family: 'Dancing Script', cursive;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--rosa);
+}
+
+.capa-cardapio-sub {
+  font-size: 13px;
+  color: #c9c9cf;
+}
+
+.capa-cardapio + .busca,
+.bloco + .busca {
+  margin-bottom: 10px;
+}
+
+.secao-cardapio {
+  margin-top: 22px;
+}
+
+.secao-cardapio header {
+  margin: 0 4px 10px;
+}
+
+.secao-cardapio h2 {
+  font-family: 'Poppins', 'Inter', sans-serif;
+  font-size: 19px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.secao-cardapio h2::after {
+  content: '';
+  display: block;
+  width: 28px;
+  height: 4px;
+  margin-top: 6px;
+  border-radius: 4px;
+  background: var(--rosa);
+}
+
+.secao-cardapio header p {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--suave);
+}
+
+.lista-cardapio {
+  padding: 4px 16px;
+}
+
+.item-cardapio {
+  display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 20px 12px 18px;
-  text-align: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 0;
+  border: 0;
+  background: none;
   font: inherit;
+  color: inherit;
+  text-align: left;
   cursor: pointer;
 }
 
-.vitrine-item strong {
-  font-size: 14px;
+.item-cardapio + .item-cardapio,
+.item-cardapio-edicao + .item-cardapio,
+.item-cardapio + .item-cardapio-edicao {
+  border-top: 1px solid var(--borda);
+}
+
+.item-cardapio-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.item-cardapio-texto strong {
+  font-size: 15px;
   line-height: 1.3;
 }
 
-.vitrine-preco {
-  display: inline-block;
-  padding: 5px 14px;
+.item-cardapio-descricao {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--suave);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.item-cardapio-preco {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--suave);
+}
+
+.item-cardapio-preco b {
+  padding: 4px 12px;
   border-radius: 999px;
   background: var(--rosa);
   color: #141416;
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 13px;
 }
 
-.vitrine-edicao {
-  grid-column: 1 / -1;
+.item-cardapio-edicao {
+  padding: 14px 0;
+}
+
+.dica {
+  margin: -4px 0 0;
+  font-size: 13px;
+  color: var(--suave);
 }
 
 .produto-form {
@@ -1142,11 +1262,13 @@ legend {
 
 .produto-campos {
   display: grid;
-  grid-template-columns: 1fr 110px;
+  grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
 
-.produto-campos input {
+.produto-form input:not([type='file']),
+.produto-form select,
+.produto-form textarea {
   background: var(--superficie-2) !important;
 }
 
@@ -1286,9 +1408,6 @@ legend {
     padding-top: 12px;
   }
 
-  .vitrine {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
 }
 
 /* Dentro de cartões brancos, botões e chips ganham fundo gelo para não sumirem. */
@@ -1799,4 +1918,13 @@ legend {
 
 .opcao-produto.adicionado .opcao-preco {
   color: var(--sucesso);
+}
+
+.janela-secao h3 {
+  margin: 14px 4px 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--suave);
 }
