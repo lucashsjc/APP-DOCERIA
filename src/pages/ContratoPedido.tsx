@@ -8,6 +8,7 @@ import { montarContrato, mensagemAceite, type Bloco } from '../lib/contratos'
 import { gerarContratoPdf } from '../lib/contratoPdf'
 import { linkWhatsApp, somarDias } from '../lib/format'
 import { formatarQuantidade } from '../lib/producao'
+import { NOME_LOJA } from '../marca'
 import { useCarregar } from '../lib/useCarregar'
 
 function contratoInicial(pedido: Pedido): DadosContrato {
@@ -32,7 +33,7 @@ function dataHora(iso?: string) {
 function Previa({ blocos }: { blocos: Bloco[] }) {
   return (
     <article className="folha">
-      <img className="folha-logo" src="/logo-loja.jpg" alt="Ateliê Doce Festa" />
+      <img className="folha-logo" src="/logo-loja.jpg" alt={NOME_LOJA} />
       {blocos.map((b, i) => {
         switch (b.tipo) {
           case 'titulo':
