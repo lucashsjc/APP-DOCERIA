@@ -105,7 +105,7 @@ export function criarRepoLocal(): Repo {
 
     async listarProdutos() {
       return ler()
-        .produtos.map((p) => ({ ...p, categoria: p.categoria ?? '', descricao: p.descricao ?? '', unidade: p.unidade ?? 'un' }))
+        .produtos.map((p) => ({ ...p, categoria: p.categoria ?? '', descricao: p.descricao ?? '', unidade: p.unidade ?? 'un', custo: p.custo ?? 0 }))
         .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'))
     },
     async salvarProduto(dados, id) {

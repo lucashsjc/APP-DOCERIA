@@ -1935,3 +1935,14 @@ legend {
   letter-spacing: 0.05em;
   color: var(--suave);
 }
+
+.item-cardapio-lucro {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--superficie-2);
+  font-weight: 600;
+}
+
+.indicador.largo {
+  grid-column: 1 / -1;
+}

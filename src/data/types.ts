@@ -34,6 +34,8 @@ export interface ItemPedido {
   descricao: string
   quantidade: number
   valor_unitario: number
+  /** Custo da unidade quando o pedido foi salvo (vem do cardápio). Sem ele, usa o custo atual do produto. */
+  custo_unitario?: number
 }
 
 export interface Pedido {
@@ -104,6 +106,8 @@ export interface Produto {
   descricao: string
   /** "cento": preço é por unidade, mas o cardápio mostra o cento e o meio cento. */
   unidade: 'un' | 'cento'
+  /** Quanto custa fazer uma unidade (ingredientes, embalagem). 0 = não informado. */
+  custo: number
 }
 
 export type NovoCliente = Omit<Cliente, 'id'>

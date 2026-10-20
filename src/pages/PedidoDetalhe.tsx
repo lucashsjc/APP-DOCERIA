@@ -5,6 +5,7 @@ import { repo } from '../data/repo'
 import { STATUS, STATUS_NOME, totalPedido, type Status } from '../data/types'
 import { formatarData, formatarMoeda, linkWhatsApp } from '../lib/format'
 import { compartilharArquivo, gerarComprovante } from '../lib/comprovante'
+import { lucroPedido, mapaDeProdutos } from '../lib/lucro'
 import { useCarregar } from '../lib/useCarregar'
 import { FotoProduto } from './Cardapio'
 import PagamentosPedido from './PagamentosPedido'
@@ -40,6 +41,7 @@ export default function PedidoDetalhe() {
   const { pedido, cliente, produtos } = dados
   const produtoDoItem = (descricao: string) =>
     produtos.find((p) => p.nome.toLocaleLowerCase('pt-BR') === descricao.trim().toLocaleLowerCase('pt-BR'))
+  const lucro = lucroPedido(pedido, mapaDeProdutos(produtos))
 
   async function mudarStatus(status: Status) {
     const { id: _id, criado_em: _criado, ...resto } = pedido
@@ -147,6 +149,15 @@ export default function PedidoDetalhe() {
           <span>Total</span>
           <span>{formatarMoeda(totalPedido(pedido))}</span>
         </div>
+        {lucro.receita > 0 && (
+          <div className="linha suave">
+            <span>
+              Lucro estimado dos doces
+              {lucro.semCusto > 0 && ` · ${formatarMoeda(lucro.semCusto)} sem custo cadastrado`}
+            </span>
+            <strong className={lucro.lucro < 0 ? 'atrasado' : ''}>{formatarMoeda(lucro.lucro)}</strong>
+          </div>
+        )}
       </section>
 
       <PagamentosPedido pedido={pedido} cliente={cliente} />

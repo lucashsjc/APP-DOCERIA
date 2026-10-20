@@ -33,6 +33,8 @@ App (PWA) para a loja organizar pedidos, clientes, agenda e recebimentos. O plan
   e preço por unidade ou por cento (mostra o cento e o meio cento).
 - Botão "Enviar cardápio em PDF": gera o cardápio em A4, com fotos e preços, para mandar às clientes
   (o cardápio todo ou só a seção escolhida).
+- Custo de cada produto (só a dona vê): mostra a margem no cardápio, o lucro estimado de cada pedido e
+  o lucro e a margem nos relatórios. O custo fica guardado no pedido quando ele é salvo.
 
 **Contratos**
 - Dois modelos: encomenda de doces e locação de bolo cenográfico (texto da loja).
@@ -65,7 +67,8 @@ Sem o Supabase configurado, o app abre em **modo demonstração**: os dados fica
 2. Em **SQL Editor**, cole o conteúdo de [`supabase/schema.sql`](supabase/schema.sql) e clique em **Run**.
    Depois, numa consulta nova de cada vez, faça o mesmo com [`supabase/002_pagamentos.sql`](supabase/002_pagamentos.sql)
    e [`supabase/003_produtos.sql`](supabase/003_produtos.sql), [`004_cardapio_inicial.sql`](supabase/004_cardapio_inicial.sql)
-   , [`005_contrato.sql`](supabase/005_contrato.sql) e [`006_cardapio_organizado.sql`](supabase/006_cardapio_organizado.sql).
+   , [`005_contrato.sql`](supabase/005_contrato.sql), [`006_cardapio_organizado.sql`](supabase/006_cardapio_organizado.sql)
+   e [`007_custo.sql`](supabase/007_custo.sql).
 3. Em **Authentication → Sign In / Providers**, desligue **Allow new users to sign up**.
 4. Em **Authentication → Users**, clique em **Add user** e crie o usuário da dona com e-mail e senha.
 5. Copie `.env.example` para `.env.local` e preencha com a **Project URL** e a **anon key**

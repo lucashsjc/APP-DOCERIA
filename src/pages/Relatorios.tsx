@@ -5,11 +5,12 @@ import { contaComoVenda, totalPedido, type Pedido, type Produto } from '../data/
 import { diaDaSemana, formatarData, formatarMes, formatarMoeda, hojeIso, somarDias, somarMes } from '../lib/format'
 import { compacto, curvaSuave, topoDoEixo, type Ponto } from '../lib/graficos'
 import { formatarQuantidade } from '../lib/producao'
+import { custoDoItem, lucroDosPedidos, mapaDeProdutos, margem } from '../lib/lucro'
 import { useCarregar } from '../lib/useCarregar'
 import { FotoProduto } from './Cardapio'
 
 type Periodo = '3m' | '6m' | '12m'
-type Ordem = 'quantidade' | 'faturamento'
+type Ordem = 'quantidade' | 'faturamento' | 'lucro'
 
 const PERIODOS: Record<Periodo, string> = { '3m': '3 meses', '6m': '6 meses', '12m': '12 meses' }
 
@@ -113,21 +114,25 @@ function Indicador({
   atual,
   anterior,
   serie,
+  nota = 'vs período anterior',
+  largo = false,
 }: {
   titulo: string
   valor: string
   atual: number
   anterior: number
   serie: number[]
+  nota?: string
+  largo?: boolean
 }) {
   return (
-    <div className="indicador">
+    <div className={largo ? 'indicador largo' : 'indicador'}>
       <span className="indicador-titulo">{titulo}</span>
       <span className="indicador-linha">
         <strong>{valor}</strong>
         <Variacao atual={atual} anterior={anterior} />
       </span>
-      <span className="indicador-nota">vs período anterior</span>
+      <span className="indicador-nota">{nota}</span>
       <Faisca valores={serie} />
     </div>
   )
@@ -252,6 +257,9 @@ interface ItemRanking {
   nome: string
   quantidade: number
   faturamento: number
+  /** Só dos itens com custo; temCusto diz se houve algum. */
+  lucro: number
+  temCusto: boolean
   produto?: Produto
 }
 
@@ -286,6 +294,9 @@ export default function Relatorios() {
     const pagosAnterior = pagamentos.filter((pg) => pg.data >= iniAnterior && pg.data < ini)
 
     const soma = (ps: Pedido[]) => ps.reduce((s, p) => s + totalPedido(p), 0)
+    const cardapio = mapaDeProdutos(produtos)
+    const lucroAtual = lucroDosPedidos(noPeriodo, cardapio)
+    const lucroAnterior = lucroDosPedidos(anteriores, cardapio)
     const porFaixa = lista.map((f) => noPeriodo.filter((p) => dentro(p.data_entrega, f)))
 
     const pilhas: Pilha[] = porFaixa.map((ps) => {
@@ -329,10 +340,17 @@ export default function Relatorios() {
           nome: item.descricao.trim(),
           quantidade: 0,
           faturamento: 0,
+          lucro: 0,
+          temCusto: false,
           produto: produtos.find((pr) => pr.nome.toLocaleLowerCase('pt-BR') === chave),
         }
         atual.quantidade += item.quantidade
         atual.faturamento += item.quantidade * item.valor_unitario
+        const custo = custoDoItem(item, cardapio)
+        if (custo != null) {
+          atual.lucro += item.quantidade * (item.valor_unitario - custo)
+          atual.temCusto = true
+        }
         ranking.set(chave, atual)
       }
     }
@@ -353,7 +371,13 @@ export default function Relatorios() {
           anterior: pagosAnterior.reduce((s, pg) => s + pg.valor, 0),
           serie: lista.map((f) => pagosPeriodo.filter((pg) => dentro(pg.data, f)).reduce((s, pg) => s + pg.valor, 0)),
         },
+        lucro: {
+          atual: lucroAtual.lucro,
+          anterior: lucroAnterior.lucro,
+          serie: porFaixa.map((ps) => lucroDosPedidos(ps, cardapio).lucro),
+        },
       },
+      lucro: lucroAtual,
       mapa: dias.map((d) => ({ dia: d, futuro: d > hoje, qtd: porDia.get(d)?.length ?? 0, valor: soma(porDia.get(d) ?? []) })),
       maxDia,
       ativos,
@@ -367,7 +391,7 @@ export default function Relatorios() {
   }, [dados, periodo])
 
   const ranking = r ? [...r.ranking].sort((a, b) => b[ordem] - a[ordem]).slice(0, 10) : []
-  const maxRanking = ranking[0]?.[ordem] ?? 1
+  const maxRanking = Math.max(ranking[0]?.[ordem] ?? 1, 0.01)
   const totalVisivel = r
     ? r.pilhas.reduce((s, p) => s + CATEGORIAS.filter((c) => visiveis.has(c.chave)).reduce((ss, c) => ss + p[c.chave], 0), 0)
     : 0
@@ -400,6 +424,15 @@ export default function Relatorios() {
             <Indicador titulo="Pedidos" valor={String(r.indicadores.pedidos.atual)} {...r.indicadores.pedidos} />
             <Indicador titulo="Ticket médio" valor={compacto(r.indicadores.ticket.atual)} {...r.indicadores.ticket} />
             <Indicador titulo="Recebido" valor={compacto(r.indicadores.recebido.atual)} {...r.indicadores.recebido} />
+            {r.lucro.receita > 0 && (
+              <Indicador
+                titulo="Lucro estimado dos doces"
+                valor={compacto(r.lucro.lucro)}
+                {...r.indicadores.lucro}
+                largo
+                nota={`Margem de ${Math.round(margem(r.lucro.receita, r.lucro.custo))}% · vs período anterior`}
+              />
+            )}
           </div>
 
           <section className="painel">
@@ -535,7 +568,18 @@ export default function Relatorios() {
             <button className={ordem === 'quantidade' ? 'ativo' : ''} onClick={() => setOrdem('quantidade')}>
               Por quantidade
             </button>
+            {r.lucro.receita > 0 && (
+              <button className={ordem === 'lucro' ? 'ativo' : ''} onClick={() => setOrdem('lucro')}>
+                Por lucro
+              </button>
+            )}
           </div>
+          {r.lucro.semCusto > 0 && (
+            <p className="suave">
+              {formatarMoeda(r.lucro.semCusto)} em vendas de itens sem custo cadastrado ficam fora do lucro. Cadastre
+              o custo de cada produto no Cardápio.
+            </p>
+          )}
 
           {ranking.length === 0 ? (
             <p className="vazio">Nenhuma venda neste período.</p>
@@ -561,9 +605,21 @@ export default function Relatorios() {
                     </span>
                   </span>
                   <span className="ranking-valores">
-                    <strong>{ordem === 'quantidade' ? formatarQuantidade(item.quantidade) : formatarMoeda(item.faturamento)}</strong>
+                    <strong>
+                      {ordem === 'quantidade'
+                        ? formatarQuantidade(item.quantidade)
+                        : ordem === 'lucro'
+                          ? item.temCusto
+                            ? formatarMoeda(item.lucro)
+                            : 'sem custo'
+                          : formatarMoeda(item.faturamento)}
+                    </strong>
                     <span className="suave">
-                      {ordem === 'quantidade' ? formatarMoeda(item.faturamento) : `${formatarQuantidade(item.quantidade)} un.`}
+                      {ordem === 'quantidade'
+                        ? formatarMoeda(item.faturamento)
+                        : ordem === 'lucro'
+                          ? `de ${formatarMoeda(item.faturamento)}`
+                          : `${formatarQuantidade(item.quantidade)} un.`}
                     </span>
                   </span>
                 </div>

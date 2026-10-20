@@ -41,23 +41,30 @@ function lerProduto(linha: Record<string, unknown>): Produto {
     categoria: p.categoria ?? '',
     descricao: p.descricao ?? '',
     unidade: p.unidade === 'cento' ? 'cento' : 'un',
+    // Só existe depois do SQL 007.
+    custo: Number(p.custo ?? 0),
   }
 }
 
 /**
  * Grava a linha; se o banco ainda não tiver alguma coluna nova (SQL da atualização não rodado),
- * tenta de novo sem as colunas opcionais, para o app continuar funcionando até o SQL ser rodado.
+ * tenta de novo sem essa coluna, para o app continuar funcionando até o SQL ser rodado.
  */
 async function gravarComColunasOpcionais<T extends object>(
   gravar: (linha: T) => PromiseLike<{ data: unknown; error: { code?: string; message: string } | null }>,
   linha: T,
   opcionais: (keyof T)[],
 ) {
-  let resultado = await gravar(linha)
-  if (resultado.error?.code === 'PGRST204') {
-    const semOpcionais = { ...linha }
-    for (const campo of opcionais) delete semOpcionais[campo]
-    resultado = await gravar(semOpcionais)
+  const atual = { ...linha }
+  let restantes = [...opcionais]
+  let resultado = await gravar(atual)
+  while (resultado.error?.code === 'PGRST204' && restantes.length > 0) {
+    // A mensagem diz qual coluna falta ("Could not find the 'custo' column…"); sem isso, tira todas.
+    const faltando = restantes.filter((c) => resultado.error!.message.includes(`'${String(c)}'`))
+    const tirar = faltando.length ? faltando : restantes
+    for (const campo of tirar) delete atual[campo]
+    restantes = restantes.filter((c) => !tirar.includes(c))
+    resultado = await gravar(atual)
   }
   erro(resultado.error)
   return resultado.data
@@ -145,7 +152,7 @@ export function criarRepoSupabase(): Repo {
         (linha) =>
           (id ? db.from('produtos').update(linha).eq('id', id) : db.from('produtos').insert(linha)).select('*').single(),
         dados,
-        ['categoria', 'descricao', 'unidade'],
+        ['categoria', 'descricao', 'unidade', 'custo'],
       )
       return lerProduto(data as Record<string, unknown>)
     },

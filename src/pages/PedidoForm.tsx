@@ -2,15 +2,18 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Cabecalho, Estado } from '../components'
 import { repo } from '../data/repo'
-import { STATUS, STATUS_NOME, totalPedido, type Cliente, type DadosContrato, type NovoPedido, type Produto, type Status, type TipoEntrega } from '../data/types'
+import { STATUS, STATUS_NOME, totalPedido, type Cliente, type DadosContrato, type ItemPedido, type NovoPedido, type Produto, type Status, type TipoEntrega } from '../data/types'
 import { formatarMoeda, hojeIso, lerMoeda, moedaParaCampo } from '../lib/format'
 import { reduzirFoto } from '../lib/imagem'
+import { custoDoItem, lucroPedido, mapaDeProdutos } from '../lib/lucro'
 import SeletorCardapio from './SeletorCardapio'
 
 interface ItemCampo {
   descricao: string
   quantidade: string
   valor: string
+  /** Custo da unidade guardado no pedido (não aparece no formulário). */
+  custo?: number
 }
 
 const NOVO_CLIENTE = '__novo__'
@@ -69,6 +72,7 @@ export default function PedidoForm() {
                 descricao: i.descricao,
                 quantidade: String(i.quantidade),
                 valor: moedaParaCampo(i.valor_unitario),
+                custo: i.custo_unitario,
               }))
             : [itemVazio()],
         )
@@ -86,13 +90,20 @@ export default function PedidoForm() {
     carregar().catch((e: Error) => setErro(e.message))
   }, [id])
 
+  const cardapio = mapaDeProdutos(produtos ?? [])
   const itensLidos = itens
     .filter((i) => i.descricao.trim())
-    .map((i) => ({
-      descricao: i.descricao.trim(),
-      quantidade: Number(i.quantidade.replace(',', '.')) || 1,
-      valor_unitario: lerMoeda(i.valor),
-    }))
+    .map((i) => {
+      const item: ItemPedido = {
+        descricao: i.descricao.trim(),
+        quantidade: Number(i.quantidade.replace(',', '.')) || 1,
+        valor_unitario: lerMoeda(i.valor),
+      }
+      // Guarda o custo de hoje: se ela mudar o custo no cardápio depois, o lucro deste pedido não muda.
+      const custo = i.custo ?? custoDoItem(item, cardapio)
+      return custo ? { ...item, custo_unitario: custo } : item
+    })
+  const lucro = lucroPedido({ itens: itensLidos }, cardapio)
   const taxaLida = tipo === 'entrega' ? lerMoeda(taxa) : 0
   const total = totalPedido({ itens: itensLidos, taxa_entrega: taxaLida })
 
@@ -104,7 +115,12 @@ export default function PedidoForm() {
 
   /** Adiciona o produto escolhido na janela do cardápio, ocupando uma linha vazia se houver. */
   function adicionarDoCardapio(produto: Produto) {
-    const novo: ItemCampo = { descricao: produto.nome, quantidade: '1', valor: moedaParaCampo(produto.preco) }
+    const novo: ItemCampo = {
+      descricao: produto.nome,
+      quantidade: '1',
+      valor: moedaParaCampo(produto.preco),
+      custo: produto.custo || undefined,
+    }
     const vazia = itens.findIndex((i) => !i.descricao.trim() && !i.valor.trim())
     setItens(vazia >= 0 ? itens.map((item, i) => (i === vazia ? novo : item)) : [...itens, novo])
   }
@@ -121,6 +137,8 @@ export default function PedidoForm() {
               ...item,
               descricao,
               valor: produto && !item.valor ? moedaParaCampo(produto.preco) : item.valor,
+              // Trocou o produto: o custo passa a ser o do novo (ou o do cardápio na hora de salvar).
+              custo: produto?.custo || undefined,
             },
       ),
     )
@@ -326,6 +344,12 @@ export default function PedidoForm() {
           <span>Total</span>
           <span>{formatarMoeda(total)}</span>
         </p>
+        {lucro.receita > 0 && (
+          <p className="linha dica">
+            <span>Lucro estimado dos doces{lucro.semCusto > 0 ? ' (itens com custo)' : ''}</span>
+            <span>{formatarMoeda(lucro.lucro)}</span>
+          </p>
+        )}
 
         <label>
           Observações

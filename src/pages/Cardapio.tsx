@@ -8,6 +8,7 @@ import { useCarregar } from '../lib/useCarregar'
 import { agruparPorSecao, precoDeVitrine, SECOES_CARDAPIO, SEM_CATEGORIA } from '../lib/categorias'
 import { NOME_LOJA, SUBTITULO_LOJA } from '../marca'
 import { compartilharArquivo } from '../lib/comprovante'
+import { margem } from '../lib/lucro'
 
 /** Foto redonda do produto, como no portfólio. Sem foto, mostra a inicial. */
 export function FotoProduto({ produto, tamanho = 'grande' }: { produto: Pick<Produto, 'nome' | 'foto'>; tamanho?: 'grande' | 'media' | 'mini' }) {
@@ -40,6 +41,7 @@ function FormProduto({
 }) {
   const [nome, setNome] = useState(inicial?.nome ?? '')
   const [preco, setPreco] = useState(inicial ? moedaParaCampo(inicial.preco) : '')
+  const [custo, setCusto] = useState(inicial?.custo ? moedaParaCampo(inicial.custo) : '')
   const [categoria, setCategoria] = useState(inicial?.categoria ?? '')
   const [descricao, setDescricao] = useState(inicial?.descricao ?? '')
   const [unidade, setUnidade] = useState<Produto['unidade']>(inicial?.unidade ?? 'un')
@@ -79,6 +81,7 @@ function FormProduto({
           categoria: categoria.trim(),
           descricao: descricao.trim(),
           unidade,
+          custo: lerMoeda(custo),
         },
         inicial?.id,
       )
@@ -88,6 +91,7 @@ function FormProduto({
       if (!inicial) {
         setNome('')
         setPreco('')
+        setCusto('')
         setDescricao('')
         tirarFoto()
       }
@@ -107,6 +111,8 @@ function FormProduto({
   }
 
   const valor = lerMoeda(preco)
+  const valorCusto = lerMoeda(custo)
+  const lucroUnidade = valor - valorCusto
   const idLista = `categorias-${inicial?.id ?? 'novo'}`
 
   return (
@@ -170,6 +176,22 @@ function FormProduto({
           No cardápio: {formatarMoeda(valor * 100)} o cento · {formatarMoeda(valor * 50)} meio cento
         </p>
       )}
+      <label>
+        Custo da unidade (R$) · só você vê
+        <input
+          inputMode="decimal"
+          value={custo}
+          onChange={(e) => setCusto(e.target.value)}
+          placeholder="Ingredientes + embalagem"
+        />
+      </label>
+      {valorCusto > 0 && valor > 0 && (
+        <p className={lucroUnidade < 0 ? 'dica atrasado' : 'dica'}>
+          {lucroUnidade < 0 ? 'Prejuízo' : 'Lucro'} de {formatarMoeda(Math.abs(lucroUnidade))} por unidade (
+          {Math.round(margem(valor, valorCusto))}%)
+          {unidade === 'cento' && ` · ${formatarMoeda(lucroUnidade * 100)} no cento`}
+        </p>
+      )}
       <div className="produto-botoes">
         {inicial && (
           <button type="button" className="botao pequeno perigo" onClick={excluir}>
@@ -200,6 +222,11 @@ function ItemCardapio({ produto, aoTocar }: { produto: Produto; aoTocar: () => v
         <span className="item-cardapio-preco">
           <b>{preco.principal}</b>
           {preco.secundario && <span>{preco.secundario}</span>}
+          {produto.custo > 0 && (
+            <span className={produto.custo > produto.preco ? 'item-cardapio-lucro atrasado' : 'item-cardapio-lucro'}>
+              lucro {Math.round(margem(produto.preco, produto.custo))}%
+            </span>
+          )}
         </span>
       </span>
     </button>
