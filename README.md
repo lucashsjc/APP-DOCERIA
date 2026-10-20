@@ -31,6 +31,8 @@ App (PWA) para a loja organizar pedidos, clientes, agenda e recebimentos. O plan
 - Fotos dos produtos no cardápio (recortadas do portfólio) e miniaturas nos itens do pedido.
 - Cardápio organizado em seções (brigadeiros, doces 3D/2D, topiarias, adicionais), com descrição
   e preço por unidade ou por cento (mostra o cento e o meio cento).
+- Botão "Enviar cardápio em PDF": gera o cardápio em A4, com fotos e preços, para mandar às clientes
+  (o cardápio todo ou só a seção escolhida).
 
 **Contratos**
 - Dois modelos: encomenda de doces e locação de bolo cenográfico (texto da loja).

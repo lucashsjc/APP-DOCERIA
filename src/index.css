@@ -1087,6 +1087,7 @@ legend {
 
 .capa-cardapio {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 16px;
   padding: 20px;
@@ -1110,6 +1111,12 @@ legend {
   flex-direction: column;
   gap: 4px;
   min-width: 0;
+}
+
+.capa-cardapio .capa-cardapio-enviar {
+  flex-basis: 100%;
+  background: var(--rosa);
+  color: #141416;
 }
 
 .capa-cardapio-loja {

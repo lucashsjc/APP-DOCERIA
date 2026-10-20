@@ -7,6 +7,7 @@ import { reduzirFoto } from '../lib/imagem'
 import { useCarregar } from '../lib/useCarregar'
 import { agruparPorSecao, precoDeVitrine, SECOES_CARDAPIO, SEM_CATEGORIA } from '../lib/categorias'
 import { NOME_LOJA, SUBTITULO_LOJA } from '../marca'
+import { compartilharArquivo } from '../lib/comprovante'
 
 /** Foto redonda do produto, como no portfólio. Sem foto, mostra a inicial. */
 export function FotoProduto({ produto, tamanho = 'grande' }: { produto: Pick<Produto, 'nome' | 'foto'>; tamanho?: 'grande' | 'media' | 'mini' }) {
@@ -211,6 +212,7 @@ export default function Cardapio() {
   const [novo, setNovo] = useState(false)
   const [busca, setBusca] = useState('')
   const [secao, setSecao] = useState<string | null>(null)
+  const [gerando, setGerando] = useState(false)
 
   const secoes = useMemo(() => agruparPorSecao(produtos ?? []), [produtos])
   const categorias = useMemo(
@@ -231,6 +233,23 @@ export default function Cardapio() {
       ),
     }))
     .filter((s) => s.produtos.length > 0)
+
+  // O PDF leva o cardápio todo, ou só a seção escolhida nos filtros.
+  async function enviarPdf() {
+    const escolhidas = secoes.filter((s) => !secao || s.nome === secao)
+    if (escolhidas.length === 0) return
+    setGerando(true)
+    try {
+      const { gerarCardapioPdf } = await import('../lib/cardapioPdf')
+      const pdf = await gerarCardapioPdf(escolhidas)
+      const sufixo = secao ? `-${secao.toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[^a-z0-9]+/g, '-')}` : ''
+      await compartilharArquivo(pdf, `cardapio-atelie-doce-festa${sufixo}.pdf`, `Cardápio ${NOME_LOJA}`)
+    } catch (e) {
+      alert(`Não consegui gerar o PDF: ${(e as Error).message}`)
+    } finally {
+      setGerando(false)
+    }
+  }
 
   return (
     <>
@@ -253,6 +272,11 @@ export default function Cardapio() {
             {SUBTITULO_LOJA} · {produtos ? `${produtos.length} ${produtos.length === 1 ? 'produto' : 'produtos'}` : '…'}
           </span>
         </div>
+        {secoes.length > 0 && (
+          <button className="botao primario pequeno capa-cardapio-enviar" onClick={enviarPdf} disabled={gerando}>
+            {gerando ? 'Gerando PDF…' : secao ? `Enviar PDF de “${secao}”` : 'Enviar cardápio em PDF'}
+          </button>
+        )}
       </section>
 
       {novo && (
