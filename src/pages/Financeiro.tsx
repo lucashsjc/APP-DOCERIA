@@ -4,14 +4,55 @@ import { Cabecalho, Estado } from '../components'
 import { repo } from '../data/repo'
 import { contaComoVenda, saldoPedido, totalPedido, type Cliente, type Pedido } from '../data/types'
 import { mensagemCobranca } from '../lib/cobranca'
-import { formatarMes, formatarMoeda, hojeIso, linkWhatsApp, somarMes } from '../lib/format'
+import { formatarDataRelativa, formatarMes, formatarMoeda, hojeIso, linkWhatsApp, somarDias, somarMes } from '../lib/format'
 import { useCarregar } from '../lib/useCarregar'
+import { compartilharArquivo } from '../lib/comprovante'
+import { gerarCopiaDeSeguranca, marcarCopia, ultimaCopia } from '../lib/copiaSeguranca'
 
 interface Devedor {
   cliente: Cliente
   valor: number
   pedidos: Pedido[]
   atrasado: number
+}
+
+function CopiaDeSeguranca() {
+  const [ultima, setUltima] = useState(ultimaCopia)
+  const [gerando, setGerando] = useState(false)
+  const atrasada = !ultima || ultima < somarDias(hojeIso(), -30)
+
+  async function baixar() {
+    setGerando(true)
+    try {
+      const hoje = hojeIso()
+      const planilha = await gerarCopiaDeSeguranca()
+      await compartilharArquivo(planilha, `atelie-doce-festa-copia-${hoje}.xlsx`, 'Cópia de segurança')
+      marcarCopia(hoje)
+      setUltima(hoje)
+    } catch (e) {
+      alert(`Não consegui gerar a cópia: ${(e as Error).message}`)
+    } finally {
+      setGerando(false)
+    }
+  }
+
+  return (
+    <section className={atrasada ? 'bloco copia atrasada' : 'bloco copia'}>
+      <h2>Cópia de segurança</h2>
+      <p className="suave">
+        Uma planilha com todos os pedidos, itens, pagamentos, clientes e o cardápio. Abre no Excel, no Numbers e no
+        Google Planilhas. Guarde no iCloud Drive ou mande para você mesma no WhatsApp ou no e-mail.
+      </p>
+      <p className={atrasada ? 'copia-quando atrasado' : 'copia-quando'}>
+        {ultima
+          ? `Última cópia neste aparelho: ${formatarDataRelativa(ultima).toLocaleLowerCase('pt-BR')}${atrasada ? ' · faça uma nova' : ''}`
+          : 'Nenhuma cópia feita neste aparelho ainda.'}
+      </p>
+      <button className="botao primario" onClick={baixar} disabled={gerando}>
+        {gerando ? 'Gerando planilha…' : 'Baixar planilha'}
+      </button>
+    </section>
+  )
 }
 
 export default function Financeiro() {
@@ -126,6 +167,8 @@ export default function Financeiro() {
           </div>
         </>
       )}
+
+      <CopiaDeSeguranca />
     </>
   )
 }

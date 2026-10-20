@@ -35,6 +35,8 @@ App (PWA) para a loja organizar pedidos, clientes, agenda e recebimentos. O plan
   (o cardápio todo ou só a seção escolhida).
 - Custo de cada produto (só a dona vê): mostra a margem no cardápio, o lucro estimado de cada pedido e
   o lucro e a margem nos relatórios. O custo fica guardado no pedido quando ele é salvo.
+- Cópia de segurança (Financeiro): baixa uma planilha .xlsx com pedidos, itens, pagamentos, clientes e
+  cardápio; avisa quando a última cópia neste aparelho tem mais de 30 dias.
 
 **Contratos**
 - Dois modelos: encomenda de doces e locação de bolo cenográfico (texto da loja).

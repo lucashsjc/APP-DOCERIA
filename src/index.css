@@ -1946,3 +1946,17 @@ legend {
 .indicador.largo {
   grid-column: 1 / -1;
 }
+
+.copia {
+  margin-top: 24px;
+}
+
+.copia .botao {
+  width: 100%;
+}
+
+.copia-quando {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
